@@ -523,6 +523,92 @@
             animation: modalIn .3s cubic-bezier(.34, 1.2, .64, 1) both;
         }
 
+        /* ── ADMIN MOBILE (iPhone 13 mini e simili) ── */
+        @media (max-width: 430px) {
+
+            /* Overlay: allineato in fondo come bottom sheet */
+            #ovAdmin {
+                align-items: flex-end;
+                padding: 0;
+            }
+
+            /* Modal admin: occupa tutta la larghezza, bordi arrotondati solo in alto */
+            #adminModal {
+                max-width: 100% !important;
+                width: 100% !important;
+                border-radius: 20px 20px 0 0 !important;
+                padding: 16px 14px 28px !important;
+                margin: 0 !important;
+                max-height: 88vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                display: block !important; /* override inline flex */
+                animation: slideUp .3s cubic-bezier(.34, 1.2, .64, 1) both;
+            }
+
+            @keyframes slideUp {
+                from { transform: translateY(100%); opacity: 0; }
+                to   { transform: translateY(0);    opacity: 1; }
+            }
+
+            /* Handle bar visivo in cima al bottom sheet */
+            #adminModal::before {
+                content: '';
+                display: block;
+                width: 40px;
+                height: 4px;
+                background: rgba(255,255,255,.25);
+                border-radius: 2px;
+                margin: 0 auto 14px;
+            }
+
+            /* Pannello inline: sempre in colonna su mobile */
+            #inlineAddPanel {
+                border-left: none !important;
+                border-top: 1.5px solid rgba(144, 224, 239, .2);
+                padding-left: 0 !important;
+                padding-top: 14px;
+                margin-top: 14px;
+                min-width: unset !important;
+            }
+
+            /* Titolo modal più compatto */
+            .modal h2 { font-size: 1.15rem; margin-bottom: 12px; }
+
+            /* Sezioni admin: padding ridotto */
+            #adminPanelContent > div {
+                padding: 10px 10px !important;
+                margin-bottom: 10px !important;
+            }
+
+            /* Select e input admin: padding touch-friendly */
+            #adminPanelContent select,
+            #adminPanelContent input[type="text"],
+            #adminPanelContent input[type="number"] {
+                padding: 10px 10px !important;
+                font-size: .84rem !important;
+            }
+
+            /* Riga risultati: più spazio per i tasti */
+            .score-inp {
+                width: 42px !important;
+                padding: 6px 0 !important;
+                font-size: 1rem !important;
+            }
+
+            .score-save {
+                padding: 7px 14px !important;
+                font-size: .82rem !important;
+            }
+
+            /* Lista squadre admin: più spazio tra i pulsanti */
+            #adminTeamList .btn-del-sm {
+                padding: 5px 10px;
+                font-size: .72rem;
+            }
+        }
+
+
         @keyframes modalIn {
             from {
                 opacity: 0;
@@ -2836,7 +2922,41 @@
             border-radius: 10px;
             margin-bottom: 6px;
             font-size: .84rem;
+            border: 1.5px solid transparent;
+            transition: background .3s, border-color .3s, box-shadow .3s;
+            position: relative;
         }
+
+        /* ── PROSSIMA PARTITA: evidenziazione 5 min prima ── */
+        .match-row.match-next {
+            background: linear-gradient(135deg, rgba(255, 183, 3, 0.14), rgba(255, 107, 107, 0.10));
+            border-color: rgba(255, 183, 3, 0.65);
+            animation: matchGlow 1.8s ease-in-out infinite;
+        }
+
+        @keyframes matchGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 183, 3, 0.30), 0 0 28px rgba(255, 183, 3, 0.10); }
+            50%       { box-shadow: 0 0 22px rgba(255, 183, 3, 0.70), 0 0 55px rgba(255, 183, 3, 0.28); }
+        }
+
+        .match-row.match-next::before {
+            content: '🔔 PROSSIMA';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(90deg, #ffb703, #ff6b6b);
+            color: #010e2e;
+            font-size: 0.6rem;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            padding: 2px 10px;
+            border-radius: 20px;
+            white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(255, 183, 3, 0.5);
+        }
+
+
 
         .match-team {
             flex: 1;
@@ -2877,13 +2997,16 @@
             color: var(--deep);
             border: none;
             border-radius: 7px;
-            padding: 4px 10px;
+            padding: 6px 12px;
             font-family: 'Outfit', sans-serif;
             font-weight: 900;
-            font-size: .72rem;
+            font-size: .78rem;
             cursor: pointer;
             transition: transform .15s;
             white-space: nowrap;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 36px;
         }
 
         .score-save:hover {
@@ -3546,29 +3669,29 @@
     <!-- TOPBAR -->
     <div class="topbar" style="justify-content: center; flex-direction: column; padding: 4px 8px;">
         <!-- Prima riga: 4 Icone -->
-        <div style="display: flex; justify-content: center; width: 100%;">
-            <a href="https://wa.me/393497225376" target="_blank" rel="noopener" class="tb-item" title="WhatsApp">
+        <div style="display: flex; justify-content: space-evenly; width: 100%;">
+            <a href="https://wa.me/393497225376" target="_blank" rel="noopener" class="tb-item" style="flex:1;justify-content:center;" title="WhatsApp">
                 <div class="tb-icon wa">
                     <svg viewBox="0 0 24 24">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                     </svg>
                 </div>
             </a>
-            <a href="https://instagram.com/nuovafellegara" target="_blank" rel="noopener" class="tb-item" title="Instagram">
+            <a href="https://instagram.com/nuovafellegara" target="_blank" rel="noopener" class="tb-item" style="flex:1;justify-content:center;" title="Instagram">
                 <div class="tb-icon ig">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                     </svg>
                 </div>
             </a>
-            <a href="https://www.google.com/maps/search/Via+della+Botte+7+Fellegara" target="_blank" rel="noopener" class="tb-item" title="Posizione">
+            <a href="https://www.google.com/maps/search/Via+della+Botte+7+Fellegara" target="_blank" rel="noopener" class="tb-item" style="flex:1;justify-content:center;" title="Posizione">
                 <div class="tb-icon addr">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                     </svg>
                 </div>
             </a>
-            <button class="tb-item" onclick="openAdmin()" style="background:none;border:none;cursor:pointer;position:relative;" title="Area Admin">
+            <button class="tb-item" onclick="openAdmin()" style="flex:1;justify-content:center;background:none;border:none;cursor:pointer;position:relative;" title="Area Admin">
                 <div class="tb-icon" style="background:linear-gradient(135deg,#00b4d8,#0077b6);display:flex;align-items:center;justify-content:center;font-size:1rem;">
                     🔐
                 </div>
@@ -3578,13 +3701,13 @@
 
         <!-- Seconda riga: 2 Regolamenti -->
         <div style="display: flex; justify-content: center; width: 100%; border-top: 1px solid rgba(255,255,255,0.06);">
-            <button class="tb-item" onclick="apriRegolamento()" style="background:none;border:none;cursor:pointer;padding-top:6px;padding-bottom:6px;" title="Regolamento Torneo">
+            <button class="tb-item" onclick="apriRegolamento()" style="flex:1;justify-content:center;background:none;border:none;cursor:pointer;padding-top:6px;padding-bottom:6px;" title="Regolamento Torneo">
                 <div class="tb-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:1rem;">
                     📋
                 </div>
                 <span style="font-size:0.75rem;">REG. TORNEO</span>
             </button>
-            <button class="tb-item" onclick="apriFantasplash()" style="background:none;border:none;cursor:pointer;padding-top:6px;padding-bottom:6px;" title="Regolamento Fanta Splash">
+            <button class="tb-item" onclick="apriFantasplash()" style="flex:1;justify-content:center;background:none;border:none;cursor:pointer;padding-top:6px;padding-bottom:6px;" title="Regolamento Fanta Splash">
                 <div class="tb-icon" style="background:linear-gradient(135deg,#06b6d4,#0369a1);display:flex;align-items:center;justify-content:center;font-size:1rem;">
                     🌊
                 </div>
@@ -3604,7 +3727,7 @@
             <span class="wt-line2">18-19 Luglio 2026</span>
         </div>
         <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 15px; cursor: pointer; text-align: center; color: var(--foam);" onclick="location.reload()">
-            🔄 Ricarica la pagina per gli ultimi aggiornamenti
+            🔄 Clicca qui per ricaricare con gli ultimi aggiornamenti 🔄
         </div>
 
 
@@ -3830,7 +3953,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
     <!-- TABELLONE -->
     <div class="sec-wrap" id="secTabellone" style="margin-bottom:36px;">
         <div class="sec-card">
-            <div class="sec-title" style="text-align: center;">Calendario Partite</div>
+            <div class="sec-title" style="text-align: center;">📅 Calendario Partite 📅</div>
             <div class="campi-grid">
                 <div class="campo-col">
                     <div class="campo-hdr">🏐 Campo A</div>
@@ -4060,7 +4183,25 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
         </div>
     </div>
 
-    <!-- ══ MODAL: ELIMINA MEDIA ══ -->
+    <!-- ══ MODAL: RINOMINA SQUADRA ══ -->
+    <div class="overlay" id="ovRenTeam" onclick="ocl(event,'ovRenTeam')">
+        <div class="modal" style="max-width:340px;">
+            <div style="font-size:2.2rem;margin-bottom:10px;text-align:center;">✏️</div>
+            <h2 style="font-size:1.2rem;text-align:center;">Rinomina Squadra</h2>
+            <p style="opacity:.68;margin:8px 0 14px;font-size:.85rem;text-align:center;line-height:1.5;">Nuovo nome per <strong id="renTOldName"></strong>:</p>
+            <input type="hidden" id="renTId">
+            <div class="form-row">
+                <input type="text" id="renTNewName" placeholder="Nuovo nome squadra…" maxlength="40"
+                    onkeydown="if(event.key==='Enter')doRenameTeam()">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="cm('ovRenTeam')">Annulla</button>
+                <button class="btn-ok" onclick="doRenameTeam()" style="flex:1.4;">✏️ Rinomina</button>
+            </div>
+        </div>
+    </div>
+
+
     <div class="overlay" id="ovDelMedia" onclick="ocl(event,'ovDelMedia')">
         <div class="modal" style="max-width:300px;text-align:center;">
             <div style="font-size:2.2rem;margin-bottom:8px;">🗂️</div>
@@ -4108,7 +4249,12 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
         const CFT = ['#ffd166', '#ff6b6b', '#90e0ef', '#00b4d8', '#52b788', '#fff', '#ffb703', '#48cae4'];
         const EMAIL = 'mirkocavecchi@gmail.com';
         const EMAIL_CC = 'nuovafellegara@gmail.com';
-        const ADMIN_PW = 'splash26';   // ← password admin
+        // Password admin: memorizzata come hash SHA-256 (non in chiaro)
+        const ADMIN_PW_HASH = 'b301c0c0a1dd526139c728666cc09778a87af113fa93c1325f06e94c063c0517'; // hash SHA-256 (password non visibile)
+        async function hashPassword(pw) {
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
         const K_TEAMS = 'fsv6_teams';
         const K_MEDIA = 'fsv6_media';
         const K_VOTES = 'fsv6_votes';
@@ -4372,11 +4518,12 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
         ══════════════════════════════════ */
         function openAdd() {
             const ni = document.getElementById('inp-name'); if (ni) ni.value = '';
-            // Mostra il pannello inline a fianco nell'admin panel
             const panel = document.getElementById('inlineAddPanel');
             const modal = document.getElementById('adminModal');
+            const isMobile = window.innerWidth <= 430;
             if (panel) panel.style.display = 'block';
-            if (modal) {
+            if (modal && !isMobile) {
+                // Desktop: affiancato
                 modal.style.maxWidth = '900px';
                 modal.style.display = 'flex';
                 modal.style.gap = '24px';
@@ -4384,6 +4531,8 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 const adminContent = document.getElementById('adminPanelContent');
                 if (adminContent) adminContent.style.flex = '1';
             }
+            // Su mobile il pannello si apre in colonna (CSS gestisce il layout)
+            if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             setTimeout(() => { if (ni) ni.focus(); }, 80);
         }
         function closeInlineAdd() {
@@ -4466,6 +4615,54 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 }
             }
             saveTeams(); saveMedia(); cm('ovDelTeam'); renderTeams(); renderCampi(); renderLeaderboard();
+            renderAdminTeamList();
+        }
+
+        /* ══════════════════════════════════
+           RENAME TEAM
+        ══════════════════════════════════ */
+        function openRenameTeam(tid) {
+            const t = _teams[tid]; if (!t) return;
+            document.getElementById('renTId').value = tid;
+            document.getElementById('renTOldName').textContent = t.name;
+            document.getElementById('renTNewName').value = t.name;
+            document.getElementById('ovRenTeam').classList.add('open');
+            setTimeout(() => document.getElementById('renTNewName').focus(), 100);
+        }
+        function doRenameTeam() {
+            const tid = document.getElementById('renTId').value;
+            const newName = document.getElementById('renTNewName').value.trim();
+            if (!newName) { toast('⚠️ Inserisci un nome valido!'); return; }
+            const t = _teams[tid]; if (!t) return;
+            const oldName = t.name;
+            if (newName === oldName) { cm('ovRenTeam'); return; }
+            // Verifica duplicati
+            const isDuplicate = Object.values(_teams).some(x => x.name === newName && x !== t);
+            if (isDuplicate) { toast('⚠️ Esiste già una squadra con questo nome!'); return; }
+
+            // 1. Aggiorna nome squadra
+            _teams[tid].name = newName;
+            saveTeams();
+
+            // 2. Aggiorna partite che usano il vecchio nome
+            Object.values(_matches).forEach(m => {
+                if (m.t1 === oldName) m.t1 = newName;
+                if (m.t2 === oldName) m.t2 = newName;
+            });
+            saveMatches();
+
+            // 3. Aggiorna classifica Fantasplash
+            _ranking.forEach(r => { if (r.name === oldName) r.name = newName; });
+            saveRanking();
+
+            cm('ovRenTeam');
+            renderTeams();
+            renderCampi();
+            renderLeaderboard();
+            renderAdminTeamList();
+            renderAdminRanking();
+            populateAdminTeamSelects();
+            toast(`✅ Squadra rinominata in "${newName}"!`);
         }
 
         /* ══════════════════════════════════
@@ -4632,24 +4829,29 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
             const table = document.createElement('div');
             table.className = 'teams-table';
 
-            for (let i = 0; i < 30; i++) {
-                const t = arr[i];
-                const cell = document.createElement('div');
+            const MAX_TEAMS = 30;
+            const displayArr = arr.slice(0, MAX_TEAMS);
 
-                if (!t) {
-                    cell.className = 'tt-cell empty';
-                    cell.innerHTML = `<span class="tt-num">${i + 1}</span><span class="tt-name" style="font-size:.75rem; opacity:.5;">— libero —</span>`;
-                } else {
-                    cell.className = 'tt-cell';
-                    cell.id = 'c-' + t.id;
-                    cell.innerHTML = `
-                        <span class="tt-num">${i + 1}</span>
-                        <div class="tt-name">${esc(t.name)}</div>`;
-                }
+            displayArr.forEach((t, i) => {
+                const cell = document.createElement('div');
+                cell.className = 'tt-cell';
+                cell.id = 'c-' + t.id;
+                cell.innerHTML = `
+                    <span class="tt-num">${i + 1}</span>
+                    <div class="tt-name">${esc(t.name)}</div>`;
                 table.appendChild(cell);
+            });
+
+            if (!displayArr.length) {
+                const empty = document.createElement('div');
+                empty.style.cssText = 'grid-column:1/-1;text-align:center;opacity:.4;font-size:.88rem;padding:24px 0;';
+                empty.textContent = 'Nessuna squadra iscritta.';
+                table.appendChild(empty);
             }
+
             grid.appendChild(table);
         }
+
 
         function logoHtml(t) {
             if (t.logoType === 'img') return `<img src="${t.logo}" style="width:100%;height:100%;object-fit:cover;" alt="Logo squadra ${esc(t.name)}">`;
@@ -4977,6 +5179,43 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
             const timeVal = m.orario || '00:00';
             return `${dayVal}_${timeVal}`;
         }
+
+        /* ══════════════════════════════════
+           PROSSIMA PARTITA – evidenziazione
+           SAB = 18 lug 2026 / DOM = 19 lug 2026
+        ══════════════════════════════════ */
+        function highlightNextMatch() {
+            const now = new Date();
+            const baseSAB = new Date('2026-07-18T00:00:00');
+            const baseDOM = new Date('2026-07-19T00:00:00');
+
+            // Rimuovi tutti gli highlight esistenti
+            document.querySelectorAll('.match-row.match-next')
+                    .forEach(el => el.classList.remove('match-next'));
+
+            Object.entries(_matches).forEach(([mid, m]) => {
+                // Salta partite già giocate (con punteggio)
+                if (m.s1 !== '' && m.s2 !== '') return;
+
+                const base = m.giorno === 'DOM' ? baseDOM : baseSAB;
+                const [h, min] = (m.orario || '00:00').split(':').map(Number);
+                const matchTime = new Date(base);
+                matchTime.setHours(h, min, 0, 0);
+
+                const diffMin = (matchTime - now) / 60000;
+
+                // Finestra: da 0 a 5 minuti prima dell'inizio
+                if (diffMin >= 0 && diffMin <= 5) {
+                    const el = document.querySelector(`.match-row[data-mid="${mid}"]`);
+                    if (el) el.classList.add('match-next');
+                }
+            });
+        }
+
+        // Aggiorna highlight ogni 30 secondi
+        setInterval(highlightNextMatch, 30000);
+
+
         function renderCampi() {
             ['A', 'B'].forEach(campo => {
                 const elPub = document.getElementById('matchesCampo' + campo);
@@ -4991,7 +5230,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                         return (a[1].ts || 0) - (b[1].ts || 0);
                     });
                 const pubHtml = matchArr.map(([mid, m]) => `
-          <div class="match-row">
+          <div class="match-row" data-mid="${mid}">
             <span style="font-size: 0.72rem; font-weight: 700; color: var(--sand); background: rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 6px; white-space: nowrap; margin-right: 4px;">
               ${m.giorno || 'SAB'} ${m.orario || '00:00'}
             </span>
@@ -5004,8 +5243,11 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
             <div class="match-team right">${esc(m.t2)}</div>
           </div>`).join('') || '<div style="opacity:.38;font-size:.82rem;padding:8px 0;">Nessuna partita.</div>';
                 if (elPub) elPub.innerHTML = pubHtml;
+                // Ricalcola highlight dopo il render
+                setTimeout(highlightNextMatch, 0);
                 const admHtml = matchArr.map(([mid, m]) => `
           <div class="match-row" style="margin-bottom:6px;">
+
             <span style="font-size: 0.7rem; font-weight: 700; color: var(--sand); background: rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 6px; white-space: nowrap; margin-right: 4px;">
               ${m.giorno || 'SAB'} ${m.orario || '00:00'}
             </span>
@@ -5528,10 +5770,11 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 }
             });
         }
-        function checkAdminPw() {
+        async function checkAdminPw() {
             const v = document.getElementById('adminPwInp').value;
             const err = document.getElementById('adminPwErr');
-            if (v === ADMIN_PW) {
+            const inputHash = await hashPassword(v);
+            if (inputHash === ADMIN_PW_HASH) {
                 adminLoggedIn = true;
                 document.getElementById('adminLogin').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'flex';
@@ -5652,6 +5895,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
               <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.07);">
                 <span style="font-weight:900;color:var(--foam);min-width:20px;font-size:.8rem;">${i + 1}</span>
                 <span style="flex:1;font-weight:700;font-size:.86rem;">${esc(t.name)}</span>
+                <button class="btn-del-sm" style="background:rgba(0,180,216,.12);border-color:rgba(0,180,216,.3);color:#90e0ef;" onclick="openRenameTeam('${id}')">✏️ Ren.</button>
                 <button class="btn-del-sm" onclick="openDelTeam('${id}')">🗑️ Elimina</button>
               </div>`).join('');
         }
