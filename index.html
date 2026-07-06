@@ -614,8 +614,14 @@
             #adminPanelContent input[type="number"],
             #adminPanelContent input[type="text"],
             #adminPanelContent input[type="password"],
-            .admin-pw-wrap input {
+            .admin-pw-wrap input,
+            #ovAddTeam input {
                 font-size: 16px !important;
+            }
+
+            /* ── Previeni overflow orizzontale nel modal admin ── */
+            #adminModal {
+                overflow-x: hidden !important;
             }
 
             /* ── adminPanel: colonna verticale su mobile ── */
@@ -630,65 +636,17 @@
             }
             #adminTeamList > div > span:nth-child(2) {
                 flex: 1;
-                min-width: 120px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            /* ── Righe risultati admin: layout 2 livelli su mobile ── */
-            #adminMatchesCampoA .match-row,
-            #adminMatchesCampoB .match-row {
-                flex-wrap: wrap;
-                gap: 4px 6px;
-                padding: 8px 8px;
-            }
-
-            /* Badge orario: riga propria, tutta la larghezza */
-            #adminMatchesCampoA .match-row .amr-badge,
-            #adminMatchesCampoB .match-row .amr-badge {
-                order: 1;
-                width: 100%;
-                margin-right: 0;
-                font-size: 0.65rem !important;
-            }
-
-            /* Squadra sinistra: mezza larghezza, seconda riga */
-            #adminMatchesCampoA .match-row .match-team:not(.right),
-            #adminMatchesCampoB .match-row .match-team:not(.right) {
-                order: 2;
-                flex: 1;
                 min-width: 0;
-                font-size: 0.75rem !important;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
             }
 
-            /* Squadra destra: mezza larghezza, seconda riga */
-            #adminMatchesCampoA .match-row .match-team.right,
-            #adminMatchesCampoB .match-row .match-team.right {
-                order: 3;
-                flex: 1;
-                min-width: 0;
-                font-size: 0.75rem !important;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            /* Score (input + save): terza riga, flex espanso */
-            #adminMatchesCampoA .match-row .match-score,
-            #adminMatchesCampoB .match-row .match-score {
-                order: 4;
-                flex: 1;
-            }
-
-            /* Tasto elimina partita: accanto allo score, terza riga */
-            #adminMatchesCampoA .match-row > .btn-del-sm,
-            #adminMatchesCampoB .match-row > .btn-del-sm {
-                order: 5;
-                align-self: center;
+            /* ── inlineAddPanel: larghezza piena su mobile ── */
+            #inlineAddPanel {
+                min-width: unset !important;
+                width: 100% !important;
+                box-sizing: border-box;
             }
         }
 
@@ -3076,6 +3034,34 @@
             font-weight: 900;
         }
 
+        /* Admin match card: layout a 2 righe esplicite (orario / squadre+score) */
+        .admin-match-card {
+            background: rgba(255,255,255,.05);
+            border-radius: 10px;
+            border: 1.5px solid transparent;
+            margin-bottom: 6px;
+            overflow: hidden;
+        }
+        .amc-time {
+            padding: 5px 10px 4px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        .amc-game {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 10px;
+            font-size: .84rem;
+        }
+        .amc-game .match-team {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: .8rem;
+        }
+
         .score-save {
             background: var(--foam);
             color: var(--deep);
@@ -4253,6 +4239,22 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
         </div>
     </div>
 
+    <!-- ══ MODAL MOBILE: AGGIUNGI SQUADRA ══ -->
+    <div class="overlay" id="ovAddTeam" onclick="ocl(event,'ovAddTeam')">
+        <div class="modal" style="max-width:340px;">
+            <h2>🏐 Nuova Squadra</h2>
+            <div class="form-row">
+                <label for="inp-name-m">Nome Squadra</label>
+                <input type="text" id="inp-name-m" placeholder="Es. Beach Warriors…" autocomplete="off"
+                    onkeydown="if(event.key==='Enter'){event.preventDefault();doAddMobile();}">
+            </div>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="cm('ovAddTeam')">Annulla</button>
+                <button class="btn-ok" onclick="doAddMobile()">✅ Crea Squadra</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ══ MODAL: MODIFICA STEMMA ══ -->
     <div class="overlay" id="ovEditLogo" onclick="ocl(event,'ovEditLogo')">
         <div class="modal">
@@ -4639,13 +4641,21 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
            ADD TEAM
         ══════════════════════════════════ */
         function openAdd() {
+            const isMobile = window.innerWidth <= 430;
+            if (isMobile) {
+                // Mobile: apre modal sovrapposta
+                const nim = document.getElementById('inp-name-m');
+                if (nim) nim.value = '';
+                document.getElementById('ovAddTeam').classList.add('open');
+                setTimeout(() => { if (nim) nim.focus(); }, 80);
+                return;
+            }
+            // Desktop: pannello affiancato (comportamento invariato)
             const ni = document.getElementById('inp-name'); if (ni) ni.value = '';
             const panel = document.getElementById('inlineAddPanel');
             const modal = document.getElementById('adminModal');
-            const isMobile = window.innerWidth <= 430;
             if (panel) panel.style.display = 'block';
-            if (modal && !isMobile) {
-                // Desktop: affiancato
+            if (modal) {
                 modal.style.maxWidth = '900px';
                 modal.style.display = 'flex';
                 modal.style.gap = '24px';
@@ -4653,7 +4663,6 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 const adminContent = document.getElementById('adminPanelContent');
                 if (adminContent) adminContent.style.flex = '1';
             }
-            // Su mobile il pannello si apre in colonna (CSS gestisce il layout)
             if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             setTimeout(() => { if (ni) ni.focus(); }, 80);
         }
@@ -4680,6 +4689,23 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
             _teams[id] = { name, createdAt: Date.now() };
             saveTeams();
             closeInlineAdd();
+            renderTeams();
+            renderLeaderboard();
+            populateAdminTeamSelects();
+            toast('✅ Squadra aggiunta: ' + name + '!');
+        }
+
+        function doAddMobile() {
+            const nim = document.getElementById('inp-name-m');
+            const name = nim ? nim.value.trim() : '';
+            if (!name) {
+                if (nim) { nim.style.borderColor = 'var(--coral)'; nim.focus(); }
+                setTimeout(() => { if (nim) nim.style.borderColor = ''; }, 2000); return;
+            }
+            const id = 't' + Date.now() + Math.random().toString(36).slice(2, 6);
+            _teams[id] = { name, createdAt: Date.now() };
+            saveTeams();
+            cm('ovAddTeam');
             renderTeams();
             renderLeaderboard();
             populateAdminTeamSelects();
@@ -5367,20 +5393,23 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 // Ricalcola highlight dopo il render
                 setTimeout(highlightNextMatch, 0);
                 const admHtml = matchArr.map(([mid, m]) => `
-          <div class="match-row" style="margin-bottom:6px;">
-
-            <span class="amr-badge" style="font-size: 0.7rem; font-weight: 700; color: var(--sand); background: rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 6px; white-space: nowrap; margin-right: 4px;">
-              ${m.giorno || 'SAB'} ${m.orario || '00:00'}
-            </span>
-            <div class="match-team" style="font-size:.8rem;">${esc(m.t1)}</div>
-            <div class="match-score">
-              <input class="score-inp" id="ms1-${mid}" value="${m.s1 || ''}" placeholder="0" maxlength="2" type="number" min="0">
-              <span class="score-dash">–</span>
-              <input class="score-inp" id="ms2-${mid}" value="${m.s2 || ''}" placeholder="0" maxlength="2" type="number" min="0">
-              <button class="score-save" onclick="saveScore('${mid}')">✓</button>
+          <div class="admin-match-card">
+            <div class="amc-time">
+              <span style="font-size:0.68rem;font-weight:700;color:var(--sand);background:rgba(255,255,255,0.08);padding:2px 7px;border-radius:6px;">
+                ${m.giorno || 'SAB'} ${m.orario || '00:00'}
+              </span>
             </div>
-            <div class="match-team right" style="font-size:.8rem;">${esc(m.t2)}</div>
-            <button class="btn-del-sm" style="margin-left:6px;" onclick="delMatch('${mid}')">✕</button>
+            <div class="amc-game">
+              <div class="match-team">${esc(m.t1)}</div>
+              <div class="match-score">
+                <input class="score-inp" id="ms1-${mid}" value="${m.s1 || ''}" placeholder="0" maxlength="2" type="number" min="0">
+                <span class="score-dash">–</span>
+                <input class="score-inp" id="ms2-${mid}" value="${m.s2 || ''}" placeholder="0" maxlength="2" type="number" min="0">
+                <button class="score-save" onclick="saveScore('${mid}')">✓</button>
+              </div>
+              <div class="match-team right">${esc(m.t2)}</div>
+              <button class="btn-del-sm" style="margin-left:4px;flex-shrink:0;" onclick="delMatch('${mid}')">✕</button>
+            </div>
           </div>`).join('') || '<div style="opacity:.38;font-size:.78rem;padding:6px 0;">Nessuna partita.</div>';
                 if (elAdm) elAdm.innerHTML = admHtml;
             });
@@ -6103,7 +6132,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 <span style="font-weight:900;color:var(--foam);min-width:20px;font-size:.8rem;">${i + 1}</span>
                 <span style="flex:1;font-weight:700;font-size:.86rem;">${esc(t.name)}</span>
                 <button class="btn-del-sm" style="background:rgba(0,180,216,.12);border-color:rgba(0,180,216,.3);color:#90e0ef;" onclick="openRenameTeam('${id}')">✏️ Ren.</button>
-                <button class="btn-del-sm" onclick="openDelTeam('${id}')">🗑️ Elimina</button>
+                <button class="btn-del-sm" onclick="openDelTeam('${id}')">🗑️ Elim.</button>
               </div>`).join('');
         }
 
