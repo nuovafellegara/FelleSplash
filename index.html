@@ -606,6 +606,90 @@
                 padding: 5px 10px;
                 font-size: .72rem;
             }
+
+            /* ── Fix iOS zoom: tutti gli input/select dell'admin ≥ 16px ── */
+            #adminPanelContent input,
+            #adminPanelContent select,
+            #adminPanelContent input[type="url"],
+            #adminPanelContent input[type="number"],
+            #adminPanelContent input[type="text"],
+            #adminPanelContent input[type="password"],
+            .admin-pw-wrap input {
+                font-size: 16px !important;
+            }
+
+            /* ── adminPanel: colonna verticale su mobile ── */
+            #adminPanel {
+                flex-direction: column !important;
+            }
+
+            /* ── Lista squadre: nome + bottoni con wrap ── */
+            #adminTeamList > div {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            #adminTeamList > div > span:nth-child(2) {
+                flex: 1;
+                min-width: 120px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            /* ── Righe risultati admin: layout 2 livelli su mobile ── */
+            #adminMatchesCampoA .match-row,
+            #adminMatchesCampoB .match-row {
+                flex-wrap: wrap;
+                gap: 4px 6px;
+                padding: 8px 8px;
+            }
+
+            /* Badge orario: riga propria, tutta la larghezza */
+            #adminMatchesCampoA .match-row .amr-badge,
+            #adminMatchesCampoB .match-row .amr-badge {
+                order: 1;
+                width: 100%;
+                margin-right: 0;
+                font-size: 0.65rem !important;
+            }
+
+            /* Squadra sinistra: mezza larghezza, seconda riga */
+            #adminMatchesCampoA .match-row .match-team:not(.right),
+            #adminMatchesCampoB .match-row .match-team:not(.right) {
+                order: 2;
+                flex: 1;
+                min-width: 0;
+                font-size: 0.75rem !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            /* Squadra destra: mezza larghezza, seconda riga */
+            #adminMatchesCampoA .match-row .match-team.right,
+            #adminMatchesCampoB .match-row .match-team.right {
+                order: 3;
+                flex: 1;
+                min-width: 0;
+                font-size: 0.75rem !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            /* Score (input + save): terza riga, flex espanso */
+            #adminMatchesCampoA .match-row .match-score,
+            #adminMatchesCampoB .match-row .match-score {
+                order: 4;
+                flex: 1;
+            }
+
+            /* Tasto elimina partita: accanto allo score, terza riga */
+            #adminMatchesCampoA .match-row > .btn-del-sm,
+            #adminMatchesCampoB .match-row > .btn-del-sm {
+                order: 5;
+                align-self: center;
+            }
         }
 
 
@@ -5285,7 +5369,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 const admHtml = matchArr.map(([mid, m]) => `
           <div class="match-row" style="margin-bottom:6px;">
 
-            <span style="font-size: 0.7rem; font-weight: 700; color: var(--sand); background: rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 6px; white-space: nowrap; margin-right: 4px;">
+            <span class="amr-badge" style="font-size: 0.7rem; font-weight: 700; color: var(--sand); background: rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 6px; white-space: nowrap; margin-right: 4px;">
               ${m.giorno || 'SAB'} ${m.orario || '00:00'}
             </span>
             <div class="match-team" style="font-size:.8rem;">${esc(m.t1)}</div>
