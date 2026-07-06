@@ -3729,6 +3729,9 @@
         <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 15px; cursor: pointer; text-align: center; color: var(--foam);" onclick="location.reload()">
             🔄 Clicca qui per ricaricare con gli ultimi aggiornamenti 🔄
         </div>
+        <div style="font-size: 0.78rem; opacity: 0.55; margin-top: 8px; text-align: center; color: var(--foam); letter-spacing: 0.03em;">
+            prossimo aggiornamento tra <span id="auto-refresh-countdown" style="font-weight: 700; color: var(--sand);">5:00</span>
+        </div>
 
 
     </section>
@@ -4118,6 +4121,30 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                         <div id="adminFantaList" style="margin-top:12px;"></div>
                     </div>
 
+                    <!-- VIDEO INSTAGRAM -->
+                    <div style="background:rgba(229,70,130,.07);border:1px solid rgba(229,70,130,.25);border-radius:14px;padding:14px;margin-bottom:14px;">
+                        <div style="font-weight:900;font-size:.88rem;color:#f472b6;margin-bottom:12px;">📸 Video Instagram</div>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <!-- Squadra -->
+                            <select id="igTeam"
+                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
+                                <option value="" style="background:#01183d;color:#fff;">Seleziona Squadra…</option>
+                            </select>
+                            <!-- Link IG -->
+                            <label style="font-size:.78rem;opacity:.6;margin-bottom:2px;display:block;">🔗 Incolla link IG</label>
+                            <input type="url" id="igUrl" placeholder="https://www.instagram.com/reel/..."
+                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.85rem;outline:none;width:100%;">
+                            <!-- Numero like -->
+                            <label style="font-size:.78rem;opacity:.6;margin-bottom:2px;display:block;">❤️ Numero like</label>
+                            <input type="number" id="igLikes" min="0" value="0" placeholder="0"
+                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;">
+                            <!-- Salva -->
+                            <button class="btn-ok" style="margin-top:4px;background:linear-gradient(135deg,#e94d8a,#9333ea);" onclick="adminAddIgVideo()">💾 Salva Video IG</button>
+                        </div>
+                        <!-- Lista video inseriti -->
+                        <div id="adminIgList" style="margin-top:12px;"></div>
+                    </div>
+
 
                 </div><!-- /adminPanelContent -->
 
@@ -4268,6 +4295,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
         const K_NEXTMATCH = 'fsv6_nextmatch';   // prossimo match data
         const K_FAVS = 'fsv6_favs';        // favourite team IDs
         const K_FANTA = 'fsv6_fantaData';   // fanta splash entries
+        const K_IGVIDEOS = 'fsv6_igVideos';    // video instagram per squadra
         const TOURNAMENT_DATE = new Date('2026-07-18T09:00:00');
 
         /* ══════════════════════════════════
@@ -4296,6 +4324,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
         let _nextMatch = {};
         let _favs = [];
         let _fantaData = {};  // { [teamName]: [{perf, count, ropeLen, pts, label}] }
+        let _igVideos = {};   // { [teamName]: [{url, likes}] }
         let nmTimer = null;
         let searchQ = '';
 
@@ -4361,6 +4390,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
             _nextMatch = JSON.parse(localStorage.getItem(K_NEXTMATCH) || '{}');
             _favs = JSON.parse(localStorage.getItem(K_FAVS) || '[]');
             _fantaData = JSON.parse(localStorage.getItem(K_FANTA) || '{}');
+            _igVideos  = JSON.parse(localStorage.getItem(K_IGVIDEOS) || '{}');
         }
 
         function fbListen() {
@@ -4432,6 +4462,13 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 renderFantaLeaderboard();
                 if (adminLoggedIn) renderAdminFanta();
             });
+            ref.child('igVideos').on('value', snap => {
+                const v = snap.val();
+                _igVideos = v !== null ? v : {};
+                localStorage.setItem(K_IGVIDEOS, JSON.stringify(_igVideos));
+                renderFantaLeaderboard();
+                if (adminLoggedIn) renderAdminIgVideos();
+            });
         }
 
         function saveTeams() { if (_db) _db.ref('fsv6/teams').set(_teams); localStorage.setItem(K_TEAMS, JSON.stringify(_teams)); }
@@ -4446,6 +4483,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
         function saveFavs() { localStorage.setItem(K_FAVS, JSON.stringify(_favs)); }
         function saveRanking() { if (_db) _db.ref('fsv6/ranking').set(_ranking); localStorage.setItem('fsv6_ranking', JSON.stringify(_ranking)); }
         function saveFanta() { if (_db) _db.ref('fsv6/fantaData').set(_fantaData); localStorage.setItem(K_FANTA, JSON.stringify(_fantaData)); }
+        function saveIgVideos() { if (_db) _db.ref('fsv6/igVideos').set(_igVideos); localStorage.setItem(K_IGVIDEOS, JSON.stringify(_igVideos)); }
 
 
 
@@ -4837,7 +4875,6 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 cell.className = 'tt-cell';
                 cell.id = 'c-' + t.id;
                 cell.innerHTML = `
-                    <span class="tt-num">${i + 1}</span>
                     <div class="tt-name">${esc(t.name)}</div>`;
                 table.appendChild(cell);
             });
@@ -5617,6 +5654,71 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
             toast('🗑️ Voce rimossa.');
         }
 
+        /* ── VIDEO INSTAGRAM – LOGICA ADMIN ── */
+        function adminAddIgVideo() {
+            const team = document.getElementById('igTeam').value;
+            const url  = document.getElementById('igUrl').value.trim();
+            const likes = parseInt(document.getElementById('igLikes').value) || 0;
+            if (!team) { toast('⚠️ Seleziona una squadra'); return; }
+            if (!url)  { toast('⚠️ Incolla il link Instagram'); return; }
+            if (!_igVideos[team]) _igVideos[team] = [];
+            if (_igVideos[team].length >= 6) { toast('⚠️ Massimo 6 video per squadra'); return; }
+            _igVideos[team].push({ url, likes });
+            saveIgVideos();
+            renderAdminIgVideos();
+            renderFantaLeaderboard();
+            // reset campi
+            document.getElementById('igTeam').value = '';
+            document.getElementById('igUrl').value = '';
+            document.getElementById('igLikes').value = '0';
+            toast('✅ Video Instagram salvato!');
+        }
+
+        function adminUpdateIgLikes(teamName, idx, val) {
+            if (!_igVideos[teamName] || !_igVideos[teamName][idx]) return;
+            _igVideos[teamName][idx].likes = parseInt(val) || 0;
+            saveIgVideos();
+            renderFantaLeaderboard();
+        }
+
+        function adminRemoveIgVideo(teamName, idx) {
+            if (!_igVideos[teamName]) return;
+            _igVideos[teamName].splice(idx, 1);
+            if (_igVideos[teamName].length === 0) delete _igVideos[teamName];
+            saveIgVideos();
+            renderAdminIgVideos();
+            renderFantaLeaderboard();
+            toast('🗑️ Video rimosso.');
+        }
+
+        function renderAdminIgVideos() {
+            const el = document.getElementById('adminIgList');
+            if (!el) return;
+            const teams = Object.keys(_igVideos);
+            if (!teams.length) {
+                el.innerHTML = '<div style="opacity:.4;font-size:.82rem;padding:4px 0;">Nessun video inserito.</div>';
+                return;
+            }
+            el.innerHTML = teams.sort().map(tName => {
+                const vids = _igVideos[tName];
+                const rows = vids.map((v, i) => `
+                    <div style="display:flex;align-items:center;gap:6px;padding:5px 0;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,.05);">
+                        <span style="font-size:1rem;">🔗</span>
+                        <a href="${v.url}" target="_blank" rel="noopener" style="flex:1;color:#f9a8d4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78rem;" title="${v.url}">video ${i+1}</a>
+                        <label style="font-size:.72rem;opacity:.6;white-space:nowrap;">❤️</label>
+                        <input type="number" value="${v.likes}" min="0"
+                            onchange="adminUpdateIgLikes('${esc(tName)}',${i},this.value)"
+                            style="width:60px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:3px 6px;color:#fff;font-family:'Outfit',sans-serif;font-size:.78rem;outline:none;text-align:center;">
+                        <button class="btn-del-sm" onclick="adminRemoveIgVideo('${esc(tName)}',${i})">✕</button>
+                    </div>`).join('');
+                return `
+                <div style="margin-bottom:10px;background:rgba(0,0,0,.2);border-radius:10px;padding:8px 10px;">
+                    <div style="font-weight:900;font-size:.85rem;color:#f472b6;margin-bottom:4px;">${esc(tName)} <span style="opacity:.5;font-weight:400;font-size:.75rem;">(${vids.length}/6 video)</span></div>
+                    ${rows}
+                </div>`;
+            }).join('');
+        }
+
         function renderAdminFanta() {
             const el = document.getElementById('adminFantaList');
             if (!el) return;
@@ -5661,16 +5763,37 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 return;
             }
             const sorted = Object.entries(pts).sort((a, b) => b[1] - a[1]);
+
+            // Calcola il numero massimo di video IG tra tutte le squadre
+            let maxVideos = 0;
+            Object.values(_igVideos).forEach(vids => { if (vids.length > maxVideos) maxVideos = vids.length; });
+
             el.innerHTML = `
-    <div style="margin-top:10px;display:flex;justify-content:center;">
-        <table style="width:100%;max-width:480px;border-collapse:collapse;background:rgba(255,255,255,.02);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.06);">
+    <div style="margin-top:10px;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,.02);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.06);">
             <tbody>
-                ${sorted.map(([name, p], i) => `
+                ${sorted.map(([name, p], i) => {
+                    const vids = _igVideos[name] || [];
+                    // Genera le celle video (fino a maxVideos)
+                    let vidCells = '';
+                    for (let v = 0; v < maxVideos; v++) {
+                        if (vids[v]) {
+                            vidCells += `<td style="padding:6px 10px;text-align:center;vertical-align:middle;white-space:nowrap;">
+                                <a href="${vids[v].url}" target="_blank" rel="noopener" style="font-size:1.2rem;text-decoration:none;display:block;line-height:1.2;" title="Apri video su Instagram">🔗</a>
+                                <span style="font-size:.7rem;color:#f9a8d4;font-weight:700;">❤️ ${vids[v].likes || 0}</span>
+                            </td>`;
+                        } else {
+                            vidCells += `<td style="padding:6px 10px;"></td>`;
+                        }
+                    }
+                    return `
                     <tr style="border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;">
                         <td style="padding:10px 14px;font-weight:900;color:var(--sand);width:30px;text-align:center;">${i + 1}</td>
                         <td style="padding:10px 14px;font-weight:700;text-align:left;color:#fff;">${esc(name)}</td>
                         <td style="padding:10px 14px;font-weight:900;color:#7dd3fc;text-align:right;width:80px;white-space:nowrap;">${p} pt</td>
-                    </tr>`).join('')}
+                        ${vidCells}
+                    </tr>`;
+                }).join('')}
             </tbody>
         </table>
     </div>`;
@@ -5755,7 +5878,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
         }
         function populateAdminTeamSelects() {
             populateTimeSelect();
-            ['addMatchT1', 'addMatchT2', 'rnkName', 'fsTeam'].forEach(id => {
+            ['addMatchT1', 'addMatchT2', 'rnkName', 'fsTeam', 'igTeam'].forEach(id => {
                 const sel = document.getElementById(id);
                 if (!sel) return;
                 const currentVal = sel.value;
@@ -5786,6 +5909,7 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 populateAdminTeamSelects();
                 renderTeams();
                 renderAdminFanta();
+                renderAdminIgVideos();
                 renderFantaLeaderboard();
             } else {
                 err.style.display = 'block';
@@ -5916,6 +6040,27 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
         updateAdminBadge();
         loadWeather();
         fbListen();  // attiva sync in tempo reale con Firebase
+
+        // ── Auto-refresh ogni 5 minuti con countdown visibile ──
+        (function () {
+            const MINUTI = 5;
+            let secondiRimanenti = MINUTI * 60;
+            const el = document.getElementById('auto-refresh-countdown');
+
+            function aggiornaConto() {
+                const m = Math.floor(secondiRimanenti / 60);
+                const s = secondiRimanenti % 60;
+                if (el) el.textContent = m + ':' + String(s).padStart(2, '0');
+                if (secondiRimanenti <= 0) {
+                    location.reload();
+                } else {
+                    secondiRimanenti--;
+                    setTimeout(aggiornaConto, 1000);
+                }
+            }
+
+            aggiornaConto();
+        })();
     </script>
 </body>
 
