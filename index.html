@@ -5764,35 +5764,34 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
             }
             const sorted = Object.entries(pts).sort((a, b) => b[1] - a[1]);
 
-            // Calcola il numero massimo di video IG tra tutte le squadre
-            let maxVideos = 0;
-            Object.values(_igVideos).forEach(vids => { if (vids.length > maxVideos) maxVideos = vids.length; });
-
             el.innerHTML = `
-    <div style="margin-top:10px;overflow-x:auto;">
+    <div style="margin-top:10px;">
         <table style="width:100%;border-collapse:collapse;background:rgba(255,255,255,.02);border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,.06);">
             <tbody>
                 ${sorted.map(([name, p], i) => {
                     const vids = _igVideos[name] || [];
-                    // Genera le celle video (fino a maxVideos)
-                    let vidCells = '';
-                    for (let v = 0; v < maxVideos; v++) {
-                        if (vids[v]) {
-                            vidCells += `<td style="padding:6px 10px;text-align:center;vertical-align:middle;white-space:nowrap;">
-                                <a href="${vids[v].url}" target="_blank" rel="noopener" style="font-size:1.2rem;text-decoration:none;display:block;line-height:1.2;" title="Apri video su Instagram">🔗</a>
-                                <span style="font-size:.7rem;color:#f9a8d4;font-weight:700;">❤️ ${vids[v].likes || 0}</span>
-                            </td>`;
-                        } else {
-                            vidCells += `<td style="padding:6px 10px;"></td>`;
-                        }
-                    }
+                    // Riga video: flexbox con wrap, appare solo se ci sono video
+                    const vidRow = vids.length ? `
+                    <tr>
+                        <td colspan="3" style="padding:2px 14px 10px 14px;">
+                            <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+                                ${vids.map((v, vi) => `
+                                    <a href="${v.url}" target="_blank" rel="noopener"
+                                       style="display:inline-flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;background:rgba(249,168,212,.1);border:1px solid rgba(249,168,212,.25);border-radius:10px;padding:5px 10px;min-width:52px;">
+                                        <span style="font-size:1.1rem;">🔗</span>
+                                        <span style="font-size:.68rem;color:#f9a8d4;font-weight:700;white-space:nowrap;">❤️ ${v.likes || 0}</span>
+                                    </a>`).join('')}
+                            </div>
+                        </td>
+                    </tr>` : '';
                     return `
-                    <tr style="border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem;">
-                        <td style="padding:10px 14px;font-weight:900;color:var(--sand);width:30px;text-align:center;">${i + 1}</td>
+                    <tr style="border-bottom:${vids.length ? 'none' : '1px solid rgba(255,255,255,.06)'};font-size:.9rem;">
+                        <td style="padding:10px 14px 10px 14px;font-weight:900;color:var(--sand);width:30px;text-align:center;">${i + 1}</td>
                         <td style="padding:10px 14px;font-weight:700;text-align:left;color:#fff;">${esc(name)}</td>
                         <td style="padding:10px 14px;font-weight:900;color:#7dd3fc;text-align:right;width:80px;white-space:nowrap;">${p} pt</td>
-                        ${vidCells}
-                    </tr>`;
+                    </tr>
+                    ${vidRow}
+                    ${vids.length ? '<tr><td colspan="3" style="height:0;border-bottom:1px solid rgba(255,255,255,.06);padding:0;"></td></tr>' : ''}`;
                 }).join('')}
             </tbody>
         </table>
