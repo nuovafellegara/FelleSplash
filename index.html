@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-    <meta name="theme-color" content="#03045e">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#03045e">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#0a0a0a">
     <title>Fanta Splash Volley</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
     <!-- Firebase SDK -->
@@ -3722,6 +3723,64 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 18px;
+        }
+
+        /* ═══════════════════════════════════════
+   DARK MODE (prefers-color-scheme: dark)
+   Rileva il tema scuro del dispositivo e porta
+   tutti gli sfondi su nero/grigio neutro.
+   NON altera layout, animazioni o accent colors.
+═══════════════════════════════════════ */
+        @media (prefers-color-scheme: dark) {
+
+            /* ── Variabili: sfondo corpo diventa nero neutro ── */
+            :root {
+                --bg: #0a0a0a;
+            }
+
+            /* ── Body ── */
+            body {
+                background: #0a0a0a;
+                color: #ffffff;
+            }
+
+            /* ── Background animato: togli il blu, usa nero/grigio scuro ── */
+            .bg-layer {
+                background:
+                    radial-gradient(ellipse 90% 70% at 20% -10%, rgba(0, 119, 182, 0.30) 0%, transparent 55%),
+                    radial-gradient(ellipse 70% 50% at 85% 110%, rgba(0, 180, 216, 0.20) 0%, transparent 55%),
+                    linear-gradient(160deg, #0a0a0a 0%, #111111 60%, #1a1a1a 100%);
+            }
+
+            /* ── Topbar ── */
+            .topbar {
+                background: rgba(10, 10, 10, 0.95);
+            }
+
+            /* ── Sticky section nav ── */
+            .sec-nav {
+                background: rgba(10, 10, 10, 0.90);
+            }
+
+            /* ── Overlay modali ── */
+            .overlay {
+                background: rgba(0, 0, 0, 0.92);
+            }
+
+            /* ── Overlay "Grazie" ── */
+            .gz-ov {
+                background: rgba(0, 0, 0, 0.96);
+            }
+
+            /* ── Back-to-top button ── */
+            .back-top {
+                background: rgba(10, 10, 10, 0.92);
+            }
+
+            /* ── Admin FAB ── */
+            .admin-fab {
+                background: rgba(10, 10, 10, 0.92);
+            }
         }
     </style>
 </head>
