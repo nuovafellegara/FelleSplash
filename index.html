@@ -3726,6 +3726,251 @@
         }
 
         /* ═══════════════════════════════════════
+   TEAM SEARCH (Calendario Partite)
+═══════════════════════════════════════ */
+        .team-search-wrap {
+            position: relative;
+            margin: 16px 0 4px;
+        }
+
+        .team-search-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, .08);
+            border: 1.5px solid rgba(144, 224, 239, .25);
+            border-radius: 14px;
+            padding: 11px 16px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .team-search-input-wrap:focus-within {
+            border-color: var(--foam);
+            box-shadow: 0 0 0 3px rgba(144, 224, 239, .12);
+        }
+
+        .team-search-icon {
+            font-size: 1.05rem;
+            flex-shrink: 0;
+            opacity: .65;
+        }
+
+        .team-search-input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            font-size: .96rem;
+            font-weight: 600;
+            min-width: 0;
+        }
+
+        .team-search-input::placeholder {
+            opacity: .38;
+            font-weight: 500;
+        }
+
+        .team-search-clear {
+            background: rgba(255, 255, 255, .1);
+            border: none;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: rgba(255, 255, 255, .6);
+            font-size: .75rem;
+            flex-shrink: 0;
+            transition: background .15s, color .15s;
+        }
+
+        .team-search-clear:hover {
+            background: rgba(255, 71, 87, .3);
+            color: #fff;
+        }
+
+        .team-search-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            background: rgba(2, 45, 114, .97);
+            border: 1px solid rgba(144, 224, 239, .25);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 50;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, .45);
+            backdrop-filter: blur(16px);
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .tsdi {
+            padding: 11px 16px;
+            font-size: .9rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            transition: background .15s, color .15s;
+        }
+
+        .tsdi:last-child {
+            border-bottom: none;
+        }
+
+        .tsdi:hover {
+            background: rgba(0, 180, 216, .22);
+            color: var(--foam);
+        }
+
+        .tsdi-empty {
+            opacity: .45;
+            cursor: default;
+        }
+
+        .tsdi-empty:hover {
+            background: none;
+            color: inherit;
+        }
+
+        /* Card risultati ricerca */
+        .team-search-result {
+            margin-top: 14px;
+            background: rgba(0, 0, 0, .2);
+            border: 1px solid rgba(144, 224, 239, .18);
+            border-radius: 14px;
+            overflow: hidden;
+            animation: fadeUp .28s ease both;
+        }
+
+        .ts-result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: linear-gradient(90deg, rgba(0, 119, 182, .38), rgba(0, 180, 216, .22));
+            border-bottom: 1px solid rgba(144, 224, 239, .14);
+        }
+
+        .ts-result-badge {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: .95rem;
+            color: var(--foam);
+            text-shadow: 0 1px 8px rgba(0, 180, 216, .4);
+        }
+
+        .ts-result-count {
+            font-size: .7rem;
+            font-weight: 700;
+            opacity: .52;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+        .ts-match-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ts-match-row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            flex-wrap: wrap;
+        }
+
+        .ts-match-row:last-child {
+            border-bottom: none;
+        }
+
+        .ts-match-day {
+            font-weight: 900;
+            font-size: .66rem;
+            color: var(--sand);
+            background: rgba(255, 209, 102, .12);
+            border-radius: 5px;
+            padding: 2px 7px;
+            white-space: nowrap;
+        }
+
+        .ts-match-time {
+            font-weight: 800;
+            font-size: .82rem;
+            color: var(--foam);
+            white-space: nowrap;
+            min-width: 40px;
+        }
+
+        .ts-match-campo {
+            font-size: .66rem;
+            font-weight: 900;
+            background: rgba(0, 180, 216, .18);
+            color: var(--sky);
+            border-radius: 5px;
+            padding: 2px 7px;
+            white-space: nowrap;
+            letter-spacing: .5px;
+        }
+
+        .ts-match-vs {
+            font-size: .7rem;
+            opacity: .4;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .ts-match-opp {
+            flex: 1;
+            font-weight: 700;
+            font-size: .84rem;
+            min-width: 80px;
+        }
+
+        .ts-match-score {
+            font-weight: 900;
+            font-size: .84rem;
+            padding: 2px 10px;
+            border-radius: 7px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .ts-match-score.pending {
+            color: rgba(255, 255, 255, .32);
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .ts-match-score.won {
+            color: #52b788;
+            background: rgba(82, 183, 136, .16);
+        }
+
+        .ts-match-score.lost {
+            color: var(--coral);
+            background: rgba(255, 107, 107, .14);
+        }
+
+        .ts-match-score.draw {
+            color: var(--sand);
+            background: rgba(255, 209, 102, .14);
+        }
+
+        .ts-result-empty {
+            padding: 20px 16px;
+            font-size: .85rem;
+            opacity: .45;
+            text-align: center;
+        }
+
+        /* ═══════════════════════════════════════
    DARK MODE (prefers-color-scheme: dark)
    Rileva il tema scuro del dispositivo e porta
    tutti gli sfondi su nero/grigio neutro.
@@ -4086,6 +4331,27 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
     <div class="sec-wrap" id="secTabellone" style="margin-bottom:36px;">
         <div class="sec-card">
             <div class="sec-title" style="text-align: center;">📅 Calendario Partite 📅</div>
+
+            <!-- ── RICERCA SQUADRA ── -->
+            <div class="team-search-wrap" id="teamSearchWrap">
+                <div class="team-search-input-wrap">
+                    <span class="team-search-icon">🔍</span>
+                    <input
+                        type="text"
+                        id="teamSearchInp"
+                        class="team-search-input"
+                        placeholder="Cerca la tua squadra…"
+                        autocomplete="off"
+                        oninput="tsOnInput()"
+                        onfocus="tsOnFocus()"
+                    >
+                    <button class="team-search-clear" id="teamSearchClear" onclick="tsClear()" style="display:none;" aria-label="Cancella ricerca">✕</button>
+                </div>
+                <div class="team-search-dropdown" id="teamSearchDropdown"></div>
+            </div>
+            <!-- ── CARD RISULTATI SQUADRA ── -->
+            <div class="team-search-result" id="teamSearchResult" style="display:none;"></div>
+
             <div class="campi-grid">
                 <div class="campo-col">
                     <div class="campo-hdr">🏐 Campo A</div>
@@ -5473,6 +5739,119 @@ La classifica finale del Fanta Splash sarà data dalla somma dei punti delle per
                 if (elAdm) elAdm.innerHTML = admHtml;
             });
         }
+        /* ══════════════════════════════════════════════════
+           TEAM SEARCH – ricerca live squadra nel Calendario
+        ══════════════════════════════════════════════════ */
+        function tsGetTeamNames() {
+            return Object.values(_teams)
+                .map(t => t.name)
+                .filter(Boolean)
+                .sort((a, b) => a.localeCompare(b));
+        }
+
+        function tsOnInput() {
+            const inp = document.getElementById('teamSearchInp');
+            const val = inp.value.trim().toLowerCase();
+            const dropdown = document.getElementById('teamSearchDropdown');
+            const clearBtn = document.getElementById('teamSearchClear');
+            clearBtn.style.display = val ? 'flex' : 'none';
+
+            if (!val) {
+                dropdown.innerHTML = '';
+                dropdown.style.display = 'none';
+                document.getElementById('teamSearchResult').style.display = 'none';
+                return;
+            }
+
+            const filtered = tsGetTeamNames().filter(n => n.toLowerCase().includes(val));
+
+            if (!filtered.length) {
+                dropdown.innerHTML = '<div class="tsdi tsdi-empty">Nessuna squadra trovata</div>';
+                dropdown.style.display = 'block';
+                return;
+            }
+
+            dropdown.innerHTML = filtered
+                .map(name => `<div class="tsdi" onclick="tsSelect(${JSON.stringify(name)})">${esc(name)}</div>`)
+                .join('');
+            dropdown.style.display = 'block';
+        }
+
+        function tsOnFocus() {
+            const val = document.getElementById('teamSearchInp').value.trim();
+            if (val) tsOnInput();
+        }
+
+        function tsSelect(name) {
+            document.getElementById('teamSearchInp').value = name;
+            document.getElementById('teamSearchDropdown').style.display = 'none';
+            document.getElementById('teamSearchClear').style.display = 'flex';
+            tsRender(name);
+        }
+
+        function tsClear() {
+            document.getElementById('teamSearchInp').value = '';
+            document.getElementById('teamSearchDropdown').style.display = 'none';
+            document.getElementById('teamSearchDropdown').innerHTML = '';
+            document.getElementById('teamSearchClear').style.display = 'none';
+            const res = document.getElementById('teamSearchResult');
+            res.style.display = 'none';
+            res.innerHTML = '';
+        }
+
+        function tsRender(name) {
+            const result = document.getElementById('teamSearchResult');
+            const matches = Object.values(_matches)
+                .filter(m => m.t1 === name || m.t2 === name)
+                .sort((a, b) => {
+                    const vA = getMatchSortValue(a), vB = getMatchSortValue(b);
+                    return vA < vB ? -1 : vA > vB ? 1 : 0;
+                });
+
+            if (!matches.length) {
+                result.innerHTML = `<div class="ts-result-empty">Nessuna partita trovata per <strong>${esc(name)}</strong>.</div>`;
+                result.style.display = 'block';
+                return;
+            }
+
+            const rows = matches.map(m => {
+                const isT1    = m.t1 === name;
+                const opp     = esc(isT1 ? m.t2 : m.t1);
+                const myS     = isT1 ? m.s1 : m.s2;
+                const oppS    = isT1 ? m.s2 : m.s1;
+                const hasScore = myS !== '' && myS != null && oppS !== '' && oppS != null;
+                const won  = hasScore && Number(myS) > Number(oppS);
+                const lost = hasScore && Number(myS) < Number(oppS);
+                const cls  = hasScore ? (won ? 'won' : lost ? 'lost' : 'draw') : 'pending';
+                const scoreLabel = hasScore ? `${myS} – ${oppS}` : '–';
+                return `<div class="ts-match-row">
+                    <span class="ts-match-day">${m.giorno || 'SAB'}</span>
+                    <span class="ts-match-time">${m.orario || '--:--'}</span>
+                    <span class="ts-match-campo">Campo ${m.girone || '?'}</span>
+                    <span class="ts-match-vs">vs</span>
+                    <span class="ts-match-opp">${opp}</span>
+                    <span class="ts-match-score ${cls}">${scoreLabel}</span>
+                </div>`;
+            }).join('');
+
+            result.innerHTML = `
+                <div class="ts-result-header">
+                    <span class="ts-result-badge">🏐 ${esc(name)}</span>
+                    <span class="ts-result-count">${matches.length} partita${matches.length !== 1 ? 'e' : ''}</span>
+                </div>
+                <div class="ts-match-list">${rows}</div>`;
+            result.style.display = 'block';
+            result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Chiude il dropdown cliccando fuori
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('#teamSearchWrap')) {
+                const d = document.getElementById('teamSearchDropdown');
+                if (d) d.style.display = 'none';
+            }
+        });
+
         function saveScore(mid) {
             const s1 = document.getElementById('ms1-' + mid).value;
             const s2 = document.getElementById('ms2-' + mid).value;
