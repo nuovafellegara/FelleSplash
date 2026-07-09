@@ -4414,48 +4414,6 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                         <span style="font-size:.82rem;opacity:.6;">Area di controllo torneo</span>
                         <button class="btn-del-sm" onclick="adminLogout()">🚪 Esci</button>
                     </div>
-                    <!-- GESTIONE SQUADRE -->
-                    <div
-                        style="background:rgba(82,183,136,.08);border:1px solid rgba(82,183,136,.2);border-radius:14px;padding:14px;margin-bottom:14px;">
-                        <div style="font-weight:900;font-size:.88rem;color:#52b788;margin-bottom:12px;">🏐 Gestione
-                            Squadre</div>
-                        <button class="btn-ok" id="btnOpenAdd"
-                            style="background:linear-gradient(135deg,#52b788,#2d6a4f);width:100%;margin-top:2px;"
-                            onclick="openAdd()">➕ Aggiungi Nuova Squadra</button>
-                        <div id="adminTeamList" style="margin-top:10px;"></div>
-                    </div>
-                    <!-- AGGIUNGI PARTITE -->
-                    <div
-                        style="background:rgba(0,180,216,.08);border:1px solid rgba(0,180,216,.2);border-radius:14px;padding:14px;margin-bottom:14px;">
-                        <div style="font-weight:900;font-size:.88rem;color:var(--foam);margin-bottom:12px;">🏐 Aggiungi partite</div>
-                        <div style="display:flex;flex-direction:column;gap:6px;">
-                            <select id="addMatchT1"
-                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
-                                <option value="" style="background:#01183d;color:#fff;">Seleziona squadra 1…</option>
-                            </select>
-                            <select id="addMatchT2"
-                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
-                                <option value="" style="background:#01183d;color:#fff;">Seleziona squadra 2…</option>
-                            </select>
-                            <select id="addMatchCampo"
-                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
-                                <option value="" style="background:#01183d;color:#fff;">Seleziona campo…</option>
-                                <option value="A" style="background:#01183d;color:#fff;">Campo A</option>
-                                <option value="B" style="background:#01183d;color:#fff;">Campo B</option>
-                            </select>
-                            <select id="addMatchTime"
-                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
-                                <option value="" style="background:#01183d;color:#fff;">Seleziona orario…</option>
-                            </select>
-                            <select id="addMatchDay"
-                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
-                                <option value="" style="background:#01183d;color:#fff;">Seleziona giorno…</option>
-                                <option value="SAB" style="background:#01183d;color:#fff;">SAB (Sabato)</option>
-                                <option value="DOM" style="background:#01183d;color:#fff;">DOM (Domenica)</option>
-                            </select>
-                            <button class="btn-ok" style="margin-top:4px;" onclick="addMatch()">➕ Aggiungi Partita</button>
-                        </div>
-                    </div>
                     <!-- RISULTATI E PARTITE CAMPO A -->
                     <div
                         style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;margin-bottom:14px;">
@@ -4541,6 +4499,49 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                         <div id="adminIgList" style="margin-top:12px;"></div>
                     </div>
 
+                    <!-- AGGIUNGI PARTITE -->
+                    <div
+                        style="background:rgba(0,180,216,.08);border:1px solid rgba(0,180,216,.2);border-radius:14px;padding:14px;margin-bottom:14px;">
+                        <div style="font-weight:900;font-size:.88rem;color:var(--foam);margin-bottom:12px;">🏐 Aggiungi partite</div>
+                        <div style="display:flex;flex-direction:column;gap:6px;">
+                            <select id="addMatchT1"
+                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
+                                <option value="" style="background:#01183d;color:#fff;">Seleziona squadra 1…</option>
+                            </select>
+                            <select id="addMatchT2"
+                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
+                                <option value="" style="background:#01183d;color:#fff;">Seleziona squadra 2…</option>
+                            </select>
+                            <select id="addMatchCampo"
+                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
+                                <option value="" style="background:#01183d;color:#fff;">Seleziona campo…</option>
+                                <option value="A" style="background:#01183d;color:#fff;">Campo A</option>
+                                <option value="B" style="background:#01183d;color:#fff;">Campo B</option>
+                            </select>
+                            <select id="addMatchTime"
+                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
+                                <option value="" style="background:#01183d;color:#fff;">Seleziona orario…</option>
+                            </select>
+                            <select id="addMatchDay"
+                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
+                                <option value="" style="background:#01183d;color:#fff;">Seleziona giorno…</option>
+                                <option value="SAB" style="background:#01183d;color:#fff;">SAB (Sabato)</option>
+                                <option value="DOM" style="background:#01183d;color:#fff;">DOM (Domenica)</option>
+                            </select>
+                            <button class="btn-ok" style="margin-top:4px;" onclick="addMatch()">➕ Aggiungi Partita</button>
+                        </div>
+                    </div>
+
+                    <!-- GESTIONE SQUADRE -->
+                    <div
+                        style="background:rgba(82,183,136,.08);border:1px solid rgba(82,183,136,.2);border-radius:14px;padding:14px;margin-bottom:14px;">
+                        <div style="font-weight:900;font-size:.88rem;color:#52b788;margin-bottom:12px;">🏐 Gestione
+                            Squadre</div>
+                        <button class="btn-ok" id="btnOpenAdd"
+                            style="background:linear-gradient(135deg,#52b788,#2d6a4f);width:100%;margin-top:2px;"
+                            onclick="openAdd()">➕ Aggiungi Nuova Squadra</button>
+                        <div id="adminTeamList" style="margin-top:10px;"></div>
+                    </div>
 
                 </div><!-- /adminPanelContent -->
 
@@ -5718,25 +5719,44 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 if (elPub) elPub.innerHTML = pubHtml;
                 // Ricalcola highlight dopo il render
                 setTimeout(highlightNextMatch, 0);
-                const admHtml = matchArr.map(([mid, m]) => `
-          <div class="admin-match-card">
-            <div class="amc-time">
-              <span style="font-size:0.68rem;font-weight:700;color:var(--sand);background:rgba(255,255,255,0.08);padding:2px 7px;border-radius:6px;">
-                ${m.giorno || 'SAB'} ${m.orario || '00:00'}
-              </span>
-            </div>
-            <div class="amc-game">
-              <div class="match-team">${esc(m.t1)}</div>
-              <div class="match-score">
-                <input class="score-inp" id="ms1-${mid}" value="${m.s1 || ''}" placeholder="0" maxlength="2" type="number" min="0">
-                <span class="score-dash">–</span>
-                <input class="score-inp" id="ms2-${mid}" value="${m.s2 || ''}" placeholder="0" maxlength="2" type="number" min="0">
-                <button class="score-save" onclick="saveScore('${mid}')">✓</button>
+                const admHtml = matchArr.map(([mid, m]) => {
+                    const allTeams = Object.values(_teams).sort((a, b) => a.name.localeCompare(b.name));
+                    const teamOpts1 = allTeams.map(t => `<option value="${esc(t.name)}" ${t.name === m.t1 ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
+                    const teamOpts2 = allTeams.map(t => `<option value="${esc(t.name)}" ${t.name === m.t2 ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
+                    return `
+          <div class="admin-match-card" style="padding:12px; display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="display:flex; gap:6px;">
+                <select id="mday-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.75rem;padding:2px 4px;outline:none;">
+                  <option value="SAB" ${m.giorno === 'SAB' ? 'selected' : ''}>SAB</option>
+                  <option value="DOM" ${m.giorno === 'DOM' ? 'selected' : ''}>DOM</option>
+                </select>
+                <input type="time" id="mtime-${mid}" value="${m.orario || ''}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.75rem;padding:2px 4px;outline:none; width:70px;">
               </div>
-              <div class="match-team right">${esc(m.t2)}</div>
-              <button class="btn-del-sm" style="margin-left:4px;flex-shrink:0;" onclick="delMatch('${mid}')">✕</button>
+              <button class="btn-del-sm" onclick="delMatch('${mid}')">✕ Elimina</button>
             </div>
-          </div>`).join('') || '<div style="opacity:.38;font-size:.78rem;padding:6px 0;">Nessuna partita.</div>';
+            
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:8px; margin-top:4px;">
+              <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                <select id="mt1-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;width:100%;">
+                  ${teamOpts1}
+                </select>
+                <input class="score-inp" id="ms1-${mid}" value="${m.s1 || ''}" placeholder="0" maxlength="2" type="number" min="0" style="width:100%; text-align:center;">
+              </div>
+              
+              <div style="font-weight:900; color:rgba(255,255,255,0.4); padding-bottom:10px;">VS</div>
+              
+              <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+                <select id="mt2-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;width:100%;">
+                  ${teamOpts2}
+                </select>
+                <input class="score-inp" id="ms2-${mid}" value="${m.s2 || ''}" placeholder="0" maxlength="2" type="number" min="0" style="width:100%; text-align:center;">
+              </div>
+            </div>
+            
+            <button class="btn-ok" style="width:100%; padding:6px; font-size:.85rem; margin-top:4px;" onclick="saveMatch('${mid}')">💾 Salva Modifiche</button>
+          </div>`;
+                }).join('') || '<div style="opacity:.38;font-size:.78rem;padding:6px 0;">Nessuna partita.</div>';
                 if (elAdm) elAdm.innerHTML = admHtml;
             });
         }
@@ -5853,10 +5873,82 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             }
         });
 
-        function saveScore(mid) {
+        function validateMatchData(t1, t2, campo, orario, giorno, excludeMid = null) {
+            if (!t1 || !t2) return { conflict: true, warnMessage: '⚠️ Inserisci entrambe le squadre!' };
+            if (t1 === t2) return { conflict: true, warnMessage: '⚠️ Scegli due squadre diverse!' };
+            if (!campo) return { conflict: true, warnMessage: '⚠️ Seleziona il campo!' };
+            if (!orario) return { conflict: true, warnMessage: '⚠️ Seleziona l\'orario!' };
+            if (!giorno) return { conflict: true, warnMessage: '⚠️ Seleziona il giorno!' };
+
+            const [nH, nM] = orario.split(':').map(Number);
+            const newMin = nH * 60 + nM;
+            let countT1 = 0;
+            let countT2 = 0;
+
+            for (const mid in _matches) {
+                if (mid === excludeMid) continue;
+                const m = _matches[mid];
+                
+                if (m.t1 === t1 || m.t2 === t1) countT1++;
+                if (m.t1 === t2 || m.t2 === t2) countT2++;
+
+                if ((m.t1 === t1 && m.t2 === t2) || (m.t1 === t2 && m.t2 === t1)) {
+                    return { conflict: true, warnMessage: `Queste due squadre si sono già sfidate in precedenza! Non possono giocare contro due volte.` };
+                }
+
+                if (m.giorno === giorno) {
+                    const [cH, cM] = m.orario.split(':').map(Number);
+                    const cMin = cH * 60 + cM;
+                    const timeDiff = Math.abs(newMin - cMin);
+
+                    if (m.girone === campo && timeDiff < 15) {
+                        return { conflict: true, warnMessage: `Sovrapposizione sul Campo ${campo}. C'è già una partita alle ${m.orario} (devi attendere 15 min).` };
+                    }
+
+                    if (m.t1 === t1 || m.t1 === t2 || m.t2 === t1 || m.t2 === t2) {
+                        if (timeDiff < 15) {
+                            const conflictingTeam = (m.t1 === t1 || m.t2 === t1) ? t1 : t2;
+                            return { conflict: true, warnMessage: `La squadra "${conflictingTeam}" gioca già una partita alle ${m.orario}. Non rispetta il turno di riposo!` };
+                        }
+                    }
+                }
+            }
+
+            if (countT1 >= 6) {
+                return { conflict: true, warnMessage: `La squadra "${t1}" ha già raggiunto il limite massimo di 6 partite nel torneo!` };
+            } else if (countT2 >= 6) {
+                return { conflict: true, warnMessage: `La squadra "${t2}" ha già raggiunto il limite massimo di 6 partite nel torneo!` };
+            }
+
+            return { conflict: false, warnMessage: '' };
+        }
+
+        function saveMatch(mid) {
             const s1 = document.getElementById('ms1-' + mid).value;
             const s2 = document.getElementById('ms2-' + mid).value;
-            _matches[mid].s1 = s1; _matches[mid].s2 = s2;
+            const t1 = document.getElementById('mt1-' + mid).value;
+            const t2 = document.getElementById('mt2-' + mid).value;
+            const day = document.getElementById('mday-' + mid).value;
+            const time = document.getElementById('mtime-' + mid).value;
+            const campo = _matches[mid].girone;
+            
+            const validation = validateMatchData(t1, t2, campo, time, day, mid);
+            if (validation.conflict) {
+                if (validation.warnMessage.startsWith('⚠️')) {
+                    toast(validation.warnMessage);
+                } else {
+                    alert('⚠️ IMPOSSIBILE MODIFICARE PARTITA:\n\n' + validation.warnMessage);
+                }
+                return;
+            }
+            
+            _matches[mid].s1 = s1; 
+            _matches[mid].s2 = s2;
+            _matches[mid].t1 = t1;
+            _matches[mid].t2 = t2;
+            _matches[mid].giorno = day;
+            _matches[mid].orario = time;
+
             saveMatches();
             const m = _matches[mid];
             if (s1 !== '' && s2 !== '') {
@@ -5865,7 +5957,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             renderCampi();
             renderLeaderboard();
             renderTeams();
-            toast('✅ Punteggio salvato!');
+            toast('✅ Modifiche salvate!');
         }
         function delMatch(mid) {
             delete _matches[mid]; saveMatches(); renderCampi(); renderLeaderboard(); renderTeams();
@@ -5877,73 +5969,13 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             const orario = document.getElementById('addMatchTime').value;
             const giorno = document.getElementById('addMatchDay').value;
 
-            if (!t1 || !t2) { toast('⚠️ Inserisci entrambe le squadre!'); return; }
-            if (t1 === t2) { toast('⚠️ Scegli due squadre diverse!'); return; }
-            if (!campo) { toast('⚠️ Seleziona il campo!'); return; }
-            if (!orario) { toast('⚠️ Seleziona l\'orario!'); return; }
-            if (!giorno) { toast('⚠️ Seleziona il giorno!'); return; }
-
-            // CONTROLLI DI SOVRAPPOSIZIONE E REGOLE TORNEO
-            const [nH, nM] = orario.split(':').map(Number);
-            const newMin = nH * 60 + nM;
-            let conflict = false;
-            let warnMessage = '';
-
-            let countT1 = 0;
-            let countT2 = 0;
-
-            for (const mid in _matches) {
-                const m = _matches[mid];
-                
-                // 1) Conteggio partite totali per squadra
-                if (m.t1 === t1 || m.t2 === t1) countT1++;
-                if (m.t1 === t2 || m.t2 === t2) countT2++;
-
-                // 2) Controllo se si sono già sfidate (indipendentemente dal giorno)
-                if ((m.t1 === t1 && m.t2 === t2) || (m.t1 === t2 && m.t2 === t1)) {
-                    conflict = true;
-                    warnMessage = `Queste due squadre si sono già sfidate in precedenza! Non possono giocare contro due volte.`;
-                    break;
+            const validation = validateMatchData(t1, t2, campo, orario, giorno);
+            if (validation.conflict) {
+                if (validation.warnMessage.startsWith('⚠️')) {
+                    toast(validation.warnMessage);
+                } else {
+                    alert('⚠️ IMPOSSIBILE AGGIUNGERE PARTITA:\n\n' + validation.warnMessage);
                 }
-
-                // 3) Controlli di orario (valgono solo per lo stesso giorno)
-                if (m.giorno === giorno) {
-                    const [cH, cM] = m.orario.split(':').map(Number);
-                    const cMin = cH * 60 + cM;
-                    const timeDiff = Math.abs(newMin - cMin);
-
-                    // Sovrapposizione stesso campo (< 15 min)
-                    if (m.girone === campo && timeDiff < 15) {
-                        conflict = true;
-                        warnMessage = `Sovrapposizione sul Campo ${campo}. C'è già una partita alle ${m.orario} (devi attendere 15 min).`;
-                        break;
-                    }
-
-                    // Riposo minimo per la singola squadra (< 15 min)
-                    if (m.t1 === t1 || m.t1 === t2 || m.t2 === t1 || m.t2 === t2) {
-                        if (timeDiff < 15) {
-                            conflict = true;
-                            const conflictingTeam = (m.t1 === t1 || m.t2 === t1) ? t1 : t2;
-                            warnMessage = `La squadra "${conflictingTeam}" gioca già una partita alle ${m.orario}. Non rispetta il turno di riposo!`;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // 4) Controllo limite 6 partite (se non ci sono stati altri conflitti prima)
-            if (!conflict) {
-                if (countT1 >= 6) {
-                    conflict = true;
-                    warnMessage = `La squadra "${t1}" ha già raggiunto il limite massimo di 6 partite nel torneo!`;
-                } else if (countT2 >= 6) {
-                    conflict = true;
-                    warnMessage = `La squadra "${t2}" ha già raggiunto il limite massimo di 6 partite nel torneo!`;
-                }
-            }
-
-            if (conflict) {
-                alert('⚠️ IMPOSSIBILE AGGIUNGERE PARTITA:\n\n' + warnMessage);
                 return;
             }
 
