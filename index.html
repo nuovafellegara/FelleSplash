@@ -4102,11 +4102,11 @@
             <span class="wt-line1">FELLE SPLASH</span>
             <span class="wt-line2">18-19 Luglio 2026</span>
         </div>
-        <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 15px; cursor: pointer; text-align: center; color: var(--foam);" onclick="location.reload()">
+        <div id="manual-refresh-btn" style="font-size: 0.85rem; opacity: 0.8; margin-top: 15px; cursor: pointer; text-align: center; color: var(--foam);" onclick="location.reload()">
             🔄 Clicca qui per ricaricare con gli ultimi aggiornamenti 🔄
         </div>
-        <div style="font-size: 0.78rem; opacity: 0.55; margin-top: 8px; text-align: center; color: var(--foam); letter-spacing: 0.03em;">
-            prossimo aggiornamento tra <span id="auto-refresh-countdown" style="font-weight: 700; color: var(--sand);">5:00</span>
+        <div id="auto-refresh-text" style="font-size: 0.78rem; opacity: 0.55; margin-top: 8px; text-align: center; color: var(--foam); letter-spacing: 0.03em;">
+            prossimo aggiornamento tra <span id="auto-refresh-countdown" style="font-weight: 700; color: var(--sand);">15:00</span>
         </div>
 
 
@@ -4511,6 +4511,10 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                             <select id="addMatchT2"
                                 style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
                                 <option value="" style="background:#01183d;color:#fff;">Seleziona squadra 2…</option>
+                            </select>
+                            <select id="addMatchArbitro"
+                                style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
+                                <option value="" style="background:#01183d;color:#fff;">Nessun arbitro (Opzionale)…</option>
                             </select>
                             <select id="addMatchCampo"
                                 style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:9px 12px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;outline:none;width:100%;cursor:pointer;">
@@ -5249,18 +5253,28 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
 
             // Inizializza con tutte le squadre registrate
             Object.values(_teams).forEach(t => {
-                pts[t.name] = { pts: 0 };
+                pts[t.name] = { matchPts: 0, refereeCount: 0, refereePts: 0, totalPts: 0 };
             });
 
-            // Somma i punteggi reali delle partite (s1 per t1, s2 per t2)
+            // Somma i punteggi reali delle partite (s1 per t1, s2 per t2) e arbitraggi
             Object.values(_matches).forEach(m => {
-                if (!pts[m.t1]) pts[m.t1] = { pts: 0 };
-                if (!pts[m.t2]) pts[m.t2] = { pts: 0 };
-                if (m.s1 !== '') pts[m.t1].pts += parseInt(m.s1 || 0);
-                if (m.s2 !== '') pts[m.t2].pts += parseInt(m.s2 || 0);
+                if (!pts[m.t1]) pts[m.t1] = { matchPts: 0, refereeCount: 0, refereePts: 0, totalPts: 0 };
+                if (!pts[m.t2]) pts[m.t2] = { matchPts: 0, refereeCount: 0, refereePts: 0, totalPts: 0 };
+                if (m.s1 !== '') pts[m.t1].matchPts += parseInt(m.s1 || 0);
+                if (m.s2 !== '') pts[m.t2].matchPts += parseInt(m.s2 || 0);
+                
+                if (m.arbitro && pts[m.arbitro]) {
+                    pts[m.arbitro].refereeCount += 1;
+                }
             });
 
-            const sorted = Object.entries(pts).sort((a, b) => b[1].pts - a[1].pts);
+            // Calcola i punti totali
+            Object.values(pts).forEach(s => {
+                s.refereePts = Math.min(20, s.refereeCount * 5);
+                s.totalPts = s.matchPts + s.refereePts;
+            });
+
+            const sorted = Object.entries(pts).sort((a, b) => b[1].totalPts - a[1].totalPts);
 
             if (!sorted.length) {
                 g.innerHTML = '<div class="lb-empty">Nessuna partita con risultato ancora.</div>';
@@ -5272,10 +5286,18 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
         <table style="width: 100%; max-width: 480px; border-collapse: collapse; background: rgba(255, 255, 255, 0.02); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06);">
             <tbody>
                 ${sorted.map(([name, s], i) => `
-                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.9rem;">
-                        <td style="padding: 10px 14px; font-weight: 900; color: var(--sand); width: 30px; text-align: center;">${i + 1}</td>
-                        <td style="padding: 10px 14px; font-weight: 700; text-align: left; color: #fff;">${esc(name)}</td>
-                        <td style="padding: 10px 14px; font-weight: 900; color: var(--foam); text-align: right; width: 80px; white-space: nowrap;">${s.pts} pt</td>
+                    <tr style="border-bottom: none; font-size: 0.9rem;">
+                        <td rowspan="2" style="padding: 10px 14px; font-weight: 900; color: var(--sand); width: 30px; text-align: center; vertical-align: top;">${i + 1}</td>
+                        <td style="padding: 10px 14px 2px 14px; font-weight: 700; text-align: left; color: #fff;">${esc(name)}</td>
+                        <td style="padding: 10px 14px 2px 14px; font-weight: 900; color: var(--foam); text-align: right; width: 80px; white-space: nowrap;">${s.matchPts} pt</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 0.8rem;">
+                        <td style="padding: 2px 14px 10px 14px; text-align: left;">
+                            ${'🪈'.repeat(Math.min(4, s.refereeCount))}
+                        </td>
+                        <td style="padding: 2px 14px 10px 14px; font-weight: 700; color: #ffeb3b; text-align: right;">
+                            ${s.refereePts > 0 ? '+' + s.refereePts + ' pt' : ''}
+                        </td>
                     </tr>
                 `).join('')}
             </tbody>
@@ -5723,6 +5745,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                     const allTeams = Object.values(_teams).sort((a, b) => a.name.localeCompare(b.name));
                     const teamOpts1 = allTeams.map(t => `<option value="${esc(t.name)}" ${t.name === m.t1 ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
                     const teamOpts2 = allTeams.map(t => `<option value="${esc(t.name)}" ${t.name === m.t2 ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
+                    const refOpts = '<option value="">Nessun arbitro (Opzionale)...</option>' + allTeams.map(t => `<option value="${esc(t.name)}" ${t.name === m.arbitro ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
                     return `
           <div class="admin-match-card" style="padding:12px; display:flex; flex-direction:column; gap:8px;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -5752,6 +5775,13 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 </select>
                 <input class="score-inp" id="ms2-${mid}" value="${m.s2 || ''}" placeholder="0" maxlength="2" type="number" min="0" style="width:100%; text-align:center;">
               </div>
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+              <span style="font-size:0.75rem; opacity:0.7; white-space:nowrap;">🪈 Arbitro:</span>
+              <select id="marbitro-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.75rem;padding:4px;outline:none;width:100%;">
+                ${refOpts}
+              </select>
             </div>
             
             <button class="btn-ok" style="width:100%; padding:6px; font-size:.85rem; margin-top:4px;" onclick="saveMatch('${mid}')">💾 Salva Modifiche</button>
@@ -5873,12 +5903,15 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             }
         });
 
-        function validateMatchData(t1, t2, campo, orario, giorno, excludeMid = null) {
+        function validateMatchData(t1, t2, campo, orario, giorno, excludeMid = null, arbitro = null) {
             if (!t1 || !t2) return { conflict: true, warnMessage: '⚠️ Inserisci entrambe le squadre!' };
             if (t1 === t2) return { conflict: true, warnMessage: '⚠️ Scegli due squadre diverse!' };
             if (!campo) return { conflict: true, warnMessage: '⚠️ Seleziona il campo!' };
             if (!orario) return { conflict: true, warnMessage: '⚠️ Seleziona l\'orario!' };
             if (!giorno) return { conflict: true, warnMessage: '⚠️ Seleziona il giorno!' };
+            if (arbitro && (arbitro === t1 || arbitro === t2)) {
+                return { conflict: true, warnMessage: '⚠️ La squadra che arbitra non può essere una delle due squadre che giocano!' };
+            }
 
             const [nH, nM] = orario.split(':').map(Number);
             const newMin = nH * 60 + nM;
@@ -5928,11 +5961,12 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             const s2 = document.getElementById('ms2-' + mid).value;
             const t1 = document.getElementById('mt1-' + mid).value;
             const t2 = document.getElementById('mt2-' + mid).value;
+            const arbitro = document.getElementById('marbitro-' + mid) ? document.getElementById('marbitro-' + mid).value : '';
             const day = document.getElementById('mday-' + mid).value;
             const time = document.getElementById('mtime-' + mid).value;
             const campo = _matches[mid].girone;
             
-            const validation = validateMatchData(t1, t2, campo, time, day, mid);
+            const validation = validateMatchData(t1, t2, campo, time, day, mid, arbitro);
             if (validation.conflict) {
                 if (validation.warnMessage.startsWith('⚠️')) {
                     toast(validation.warnMessage);
@@ -5948,6 +5982,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             _matches[mid].t2 = t2;
             _matches[mid].giorno = day;
             _matches[mid].orario = time;
+            _matches[mid].arbitro = arbitro;
 
             saveMatches();
             const m = _matches[mid];
@@ -5965,11 +6000,12 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
         function addMatch() {
             const t1 = document.getElementById('addMatchT1').value.trim();
             const t2 = document.getElementById('addMatchT2').value.trim();
+            const arbitro = document.getElementById('addMatchArbitro') ? document.getElementById('addMatchArbitro').value.trim() : '';
             const campo = document.getElementById('addMatchCampo').value;
             const orario = document.getElementById('addMatchTime').value;
             const giorno = document.getElementById('addMatchDay').value;
 
-            const validation = validateMatchData(t1, t2, campo, orario, giorno);
+            const validation = validateMatchData(t1, t2, campo, orario, giorno, null, arbitro);
             if (validation.conflict) {
                 if (validation.warnMessage.startsWith('⚠️')) {
                     toast(validation.warnMessage);
@@ -5980,11 +6016,12 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             }
 
             const mid = 'mx' + Date.now();
-            _matches[mid] = { girone: campo, t1, t2, s1: '', s2: '', orario, giorno, ts: Date.now() };
+            _matches[mid] = { girone: campo, t1, t2, arbitro, s1: '', s2: '', orario, giorno, ts: Date.now() };
             saveMatches();
 
             document.getElementById('addMatchT1').value = '';
             document.getElementById('addMatchT2').value = '';
+            if (document.getElementById('addMatchArbitro')) document.getElementById('addMatchArbitro').value = '';
             document.getElementById('addMatchCampo').value = '';
             document.getElementById('addMatchTime').value = '';
             document.getElementById('addMatchDay').value = '';
@@ -6461,7 +6498,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
         }
         function populateAdminTeamSelects() {
             populateTimeSelect();
-            ['addMatchT1', 'addMatchT2', 'rnkName', 'fsTeam', 'igTeam'].forEach(id => {
+            ['addMatchT1', 'addMatchT2', 'addMatchArbitro', 'rnkName', 'fsTeam', 'igTeam'].forEach(id => {
                 const sel = document.getElementById(id);
                 if (!sel) return;
                 const currentVal = sel.value;
@@ -6624,25 +6661,34 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
         loadWeather();
         fbListen();  // attiva sync in tempo reale con Firebase
 
-        // ── Auto-refresh ogni 5 minuti con countdown visibile ──
+        // ── Auto-refresh ogni 15 minuti con countdown visibile (Solo Desktop) ──
         (function () {
-            const MINUTI = 5;
-            let secondiRimanenti = MINUTI * 60;
-            const el = document.getElementById('auto-refresh-countdown');
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 800;
+            const manualBtn = document.getElementById('manual-refresh-btn');
+            const autoText = document.getElementById('auto-refresh-text');
+            
+            if (isMobile) {
+                if (autoText) autoText.style.display = 'none';
+                if (manualBtn) manualBtn.innerHTML = '🔄 Clicca qui per aggiornare 🔄';
+            } else {
+                const MINUTI = 15;
+                let secondiRimanenti = MINUTI * 60;
+                const el = document.getElementById('auto-refresh-countdown');
 
-            function aggiornaConto() {
-                const m = Math.floor(secondiRimanenti / 60);
-                const s = secondiRimanenti % 60;
-                if (el) el.textContent = m + ':' + String(s).padStart(2, '0');
-                if (secondiRimanenti <= 0) {
-                    location.reload();
-                } else {
-                    secondiRimanenti--;
-                    setTimeout(aggiornaConto, 1000);
+                function aggiornaConto() {
+                    const m = Math.floor(secondiRimanenti / 60);
+                    const s = secondiRimanenti % 60;
+                    if (el) el.textContent = m + ':' + String(s).padStart(2, '0');
+                    if (secondiRimanenti <= 0) {
+                        location.reload();
+                    } else {
+                        secondiRimanenti--;
+                        setTimeout(aggiornaConto, 1000);
+                    }
                 }
-            }
 
-            aggiornaConto();
+                aggiornaConto();
+            }
         })();
     </script>
 </body>
