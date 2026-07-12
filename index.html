@@ -3090,6 +3090,63 @@
             font-weight: 900;
         }
 
+        /* ══ CONFLICT CHECKER REPORT ══ */
+        .conflict-panel {
+            margin-top: 10px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,.1);
+        }
+        .conflict-section {
+            padding: 10px 12px;
+        }
+        .conflict-section + .conflict-section {
+            border-top: 1px solid rgba(255,255,255,.08);
+        }
+        .conflict-section-title {
+            font-size: .7rem;
+            font-weight: 900;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            margin-bottom: 7px;
+        }
+        .conflict-item {
+            font-size: .76rem;
+            padding: 5px 9px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+        .conflict-item:last-child { margin-bottom: 0; }
+        .ci-err  { background: rgba(255,71,87,.10);  border-left: 3px solid #ff4757; }
+        .ci-ok   { background: rgba(74,222,128,.10); border-left: 3px solid #4ade80; color:#4ade80; }
+        .ci-info { background: rgba(144,224,239,.07); border-left: 3px solid rgba(144,224,239,.35); }
+        /* Tabella squadre nel report */
+        .cst {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .72rem;
+        }
+        .cst th {
+            text-align: center;
+            padding: 4px 6px;
+            opacity: .55;
+            font-weight: 700;
+            letter-spacing: .6px;
+            border-bottom: 1px solid rgba(255,255,255,.1);
+        }
+        .cst th:first-child { text-align: left; }
+        .cst td {
+            padding: 4px 6px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,.05);
+        }
+        .cst td:first-child { text-align: left; font-weight: 700; }
+        .cst tr:last-child td { border-bottom: none; }
+        .cst .cst-ok  { color: #4ade80; }
+        .cst .cst-warn { color: #ffd166; }
+        .cst .cst-err  { color: #ff6b6b; }
+
         /* Admin match card: layout a 2 righe esplicite (orario / squadre+score) */
         .admin-match-card {
             background: rgba(255,255,255,.05);
@@ -4497,6 +4554,14 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
                         <span style="font-size:.82rem;opacity:.6;">Area di controllo torneo</span>
                         <button class="btn-del-sm" onclick="adminLogout()">🚪 Esci</button>
+                    </div>
+
+                    <!-- ══ CONTROLLA CONFLITTI ══ -->
+                    <div style="margin-bottom:14px;">
+                        <button onclick="checkAllConflicts()" style="width:100%;padding:10px;border:none;border-radius:12px;background:linear-gradient(135deg,#7c3aed,#4338ca);color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:.88rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 18px rgba(124,58,237,.35);transition:transform .15s,box-shadow .2s;touch-action:manipulation;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+                            🔍 Controlla Conflitti
+                        </button>
+                        <div id="conflictReport" style="display:none;" class="conflict-panel"></div>
                     </div>
                     <!-- RISULTATI E PARTITE CAMPO A -->
                     <div
@@ -6038,9 +6103,9 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                     }
 
                     if (m.t1 === t1 || m.t1 === t2 || m.t2 === t1 || m.t2 === t2) {
-                        if (timeDiff < 15) {
+                        if (timeDiff < 40) {
                             const conflictingTeam = (m.t1 === t1 || m.t2 === t1) ? t1 : t2;
-                            return { conflict: true, warnMessage: `La squadra "${conflictingTeam}" gioca già una partita alle ${m.orario}. Non rispetta il turno di riposo!` };
+                            return { conflict: true, warnMessage: `La squadra "${conflictingTeam}" ha già una partita alle ${m.orario}. Servono almeno 40 minuti di recupero tra una partita e l'altra!` };
                         }
                     }
                 }
@@ -6146,6 +6211,140 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             renderTeams();
             toast('✅ Partita aggiunta con successo!');
         }
+        /* ══════════════════════════════════════════════
+           CONFLICT CHECKER — checkAllConflicts()
+        ══════════════════════════════════════════════ */
+        function checkAllConflicts() {
+            const allMatches = Object.entries(_matches);
+            const errors   = [];
+
+            /* ─── Costruisce profilo per ogni squadra ─── */
+            const teamStats = {};
+            const ensureTeam = name => {
+                if (!teamStats[name]) teamStats[name] = {
+                    total: 0,
+                    bySAB: 0, byDOM: 0,
+                    byCampoA: 0, byCampoB: 0,
+                    matches: []   // { giorno, orario, campo, opponent }
+                };
+            };
+
+            allMatches.forEach(([mid, m]) => {
+                ensureTeam(m.t1); ensureTeam(m.t2);
+                [m.t1, m.t2].forEach((team, idx) => {
+                    const s = teamStats[team];
+                    s.total++;
+                    if (m.giorno === 'SAB') s.bySAB++; else s.byDOM++;
+                    if (m.girone === 'A') s.byCampoA++; else s.byCampoB++;
+                    s.matches.push({ giorno: m.giorno, orario: m.orario, campo: m.girone, opponent: idx === 0 ? m.t2 : m.t1 });
+                });
+            });
+
+            /* ─── Regola 5: Nessun rematch ─── */
+            const seenPairs = new Set();
+            allMatches.forEach(([, m]) => {
+                const pair = [m.t1, m.t2].sort().join('|||');
+                if (seenPairs.has(pair)) {
+                    errors.push(`🔄 REMATCH: <strong>${esc(m.t1)}</strong> vs <strong>${esc(m.t2)}</strong> si affrontano più di una volta!`);
+                }
+                seenPairs.add(pair);
+            });
+
+            /* ─── Check per squadra ─── */
+            Object.entries(teamStats).sort(([a],[b]) => a.localeCompare(b)).forEach(([team, s]) => {
+                const tEsc = esc(team);
+
+                /* Regola 2: max 6 totali */
+                if (s.total > 6)
+                    errors.push(`👥 <strong>${tEsc}</strong>: ${s.total} partite totali (max 6)`);
+
+                /* Regola 3: max 3 per giorno */
+                if (s.bySAB > 3)
+                    errors.push(`📅 <strong>${tEsc}</strong>: ${s.bySAB} partite di SABATO (max 3)`);
+                if (s.byDOM > 3)
+                    errors.push(`📅 <strong>${tEsc}</strong>: ${s.byDOM} partite di DOMENICA (max 3)`);
+
+                /* Regola 4: min 3 su ogni campo (solo se ha già 6 partite) */
+                if (s.total >= 6) {
+                    if (s.byCampoA < 3)
+                        errors.push(`🏟️ <strong>${tEsc}</strong>: solo ${s.byCampoA} partite su Campo A (min 3)`);
+                    if (s.byCampoB < 3)
+                        errors.push(`🏟️ <strong>${tEsc}</strong>: solo ${s.byCampoB} partite su Campo B (min 3)`);
+                }
+
+                /* Regola 1: 40 min recupero (stesso giorno, qualsiasi campo) */
+                ['SAB', 'DOM'].forEach(giorno => {
+                    const dayM = s.matches
+                        .filter(m => m.giorno === giorno)
+                        .sort((a, b) => {
+                            const [aH, aM] = a.orario.split(':').map(Number);
+                            const [bH, bM] = b.orario.split(':').map(Number);
+                            return (aH * 60 + aM) - (bH * 60 + bM);
+                        });
+                    for (let i = 0; i < dayM.length - 1; i++) {
+                        const [h1, m1] = dayM[i].orario.split(':').map(Number);
+                        const [h2, m2] = dayM[i+1].orario.split(':').map(Number);
+                        const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+                        if (diff < 40) {
+                            errors.push(`⏱️ <strong>${tEsc}</strong> (${giorno}): partita alle <strong>${dayM[i].orario}</strong> e alle <strong>${dayM[i+1].orario}</strong> → solo <strong>${diff} min</strong> di recupero (min 40)`);
+                        }
+                    }
+                });
+            });
+
+            /* ─── Costruisce HTML del report ─── */
+            let html = '';
+
+            /* Sezione errori */
+            html += `<div class="conflict-section" style="background:${errors.length ? 'rgba(255,71,87,.06)' : 'rgba(74,222,128,.06)'}">`;
+            if (errors.length === 0) {
+                html += `<div class="conflict-item ci-ok">✅ Nessun conflitto trovato! Tutte le regole sono rispettate.</div>`;
+            } else {
+                html += `<div class="conflict-section-title" style="color:#ff6b6b;">🔴 Conflitti trovati (${errors.length})</div>`;
+                errors.forEach(e => {
+                    html += `<div class="conflict-item ci-err">${e}</div>`;
+                });
+            }
+            html += '</div>';
+
+            /* Sezione tabella riepilogativa */
+            html += `<div class="conflict-section" style="background:rgba(0,0,0,.15)">`;
+            html += `<div class="conflict-section-title" style="color:var(--foam);">📊 Stato Squadre</div>`;
+            html += `<table class="cst">`;
+            html += `<tr>
+                <th>Squadra</th>
+                <th>Tot</th>
+                <th>SAB</th>
+                <th>DOM</th>
+                <th>Cpo A</th>
+                <th>Cpo B</th>
+            </tr>`;
+
+            Object.entries(teamStats).sort(([a],[b]) => a.localeCompare(b)).forEach(([team, s]) => {
+                const totCls  = s.total > 6 ? 'cst-err' : s.total === 6 ? 'cst-ok' : 'cst-warn';
+                const sabCls  = s.bySAB > 3 ? 'cst-err' : '';
+                const domCls  = s.byDOM > 3 ? 'cst-err' : '';
+                const aCls    = (s.total >= 6 && s.byCampoA < 3) ? 'cst-err' : (s.byCampoA >= 3 ? 'cst-ok' : '');
+                const bCls    = (s.total >= 6 && s.byCampoB < 3) ? 'cst-err' : (s.byCampoB >= 3 ? 'cst-ok' : '');
+                html += `<tr>
+                    <td>${esc(team)}</td>
+                    <td class="${totCls}">${s.total}</td>
+                    <td class="${sabCls}">${s.bySAB}</td>
+                    <td class="${domCls}">${s.byDOM}</td>
+                    <td class="${aCls}">${s.byCampoA}</td>
+                    <td class="${bCls}">${s.byCampoB}</td>
+                </tr>`;
+            });
+
+            html += '</table></div>';
+
+            /* Iniezione e scroll */
+            const reportEl = document.getElementById('conflictReport');
+            reportEl.innerHTML = html;
+            reportEl.style.display = 'block';
+            setTimeout(() => reportEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50);
+        }
+
         /* legacy stubs to avoid JS errors */
         function renderPlayoff() { }
         function genPlayoff() { }
