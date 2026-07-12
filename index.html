@@ -2955,12 +2955,12 @@
             white-space: nowrap;
         }
 
-        /* Match row */
+        /* Match row – layout a 2 righe per mobile */
         .match-row {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 10px;
+            flex-direction: column;
+            gap: 5px;
+            padding: 9px 10px;
             background: rgba(255, 255, 255, .05);
             border-radius: 10px;
             margin-bottom: 6px;
@@ -2999,15 +2999,56 @@
             box-shadow: 0 2px 10px rgba(255, 183, 3, 0.5);
         }
 
+        /* Riga 1: badge data + ora centrato */
+        .match-time-label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
+        .match-time-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--sand);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 3px 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        /* Riga 2: squadra1 | score | squadra2 */
+        .match-teams-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            width: 100%;
+        }
 
         .match-team {
             flex: 1;
             font-weight: 700;
+            font-size: 0.78rem;
+            min-width: 0;           /* permette il testo di andare a capo senza overflow */
+            word-break: break-word;
+            line-height: 1.25;
         }
 
         .match-team.right {
             text-align: right;
+        }
+
+        /* Schermi molto stretti (< 360px) */
+        @media (max-width: 360px) {
+            .match-team {
+                font-size: 0.68rem;
+            }
+            .match-time-badge {
+                font-size: 0.65rem;
+            }
+            .campo-col {
+                padding: 10px 8px;
+            }
         }
 
         .match-score {
@@ -4145,6 +4186,12 @@
         <a href="#secTabellone" class="sec-pill">📅 Calendario Partite</a>
         <a href="#secSquadre" class="sec-pill">🏐 Elenco Squadre</a>
     </nav>
+
+    <!-- FOOTER -->
+    <footer style="text-align: center; padding: 40px 20px 60px 20px; font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); margin-top: 40px; border-top: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.2);">
+        <div>Pagina web realizzata da Mirco Cavecchi e Andrea Gilioli</div>
+        <div style="margin-top: 5px; font-size: 0.75rem;">Per la realizzazione sono stati utilizzati strumenti di Intelligenza Artificiale</div>
+    </footer>
 
     <!-- MODAL REGOLAMENTO -->
     <div id="modalRegolamento" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:9999; overflow-y:auto; backdrop-filter:blur(6px);">
@@ -5727,16 +5774,18 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                     });
                 const pubHtml = matchArr.map(([mid, m]) => `
           <div class="match-row" data-mid="${mid}">
-            <span style="font-size: 0.72rem; font-weight: 700; color: var(--sand); background: rgba(255,255,255,0.08); padding: 3px 6px; border-radius: 6px; white-space: nowrap; margin-right: 4px;">
-              ${m.giorno || 'SAB'} ${m.orario || '00:00'}
-            </span>
-            <div class="match-team">${esc(m.t1)}</div>
-            <div class="match-score">
-              <span class="score-val">${m.s1 !== '' ? m.s1 : '–'}</span>
-              <span class="score-dash">:</span>
-              <span class="score-val">${m.s2 !== '' ? m.s2 : '–'}</span>
+            <div class="match-time-label">
+              <span class="match-time-badge">${m.giorno || 'SAB'} ${m.orario || '00:00'}</span>
             </div>
-            <div class="match-team right">${esc(m.t2)}</div>
+            <div class="match-teams-row">
+              <div class="match-team">${esc(m.t1)}</div>
+              <div class="match-score">
+                <span class="score-val">${m.s1 !== '' ? m.s1 : '–'}</span>
+                <span class="score-dash">:</span>
+                <span class="score-val">${m.s2 !== '' ? m.s2 : '–'}</span>
+              </div>
+              <div class="match-team right">${esc(m.t2)}</div>
+            </div>
           </div>`).join('') || '<div style="opacity:.38;font-size:.82rem;padding:8px 0;">Nessuna partita.</div>';
                 if (elPub) elPub.innerHTML = pubHtml;
                 // Ricalcola highlight dopo il render
