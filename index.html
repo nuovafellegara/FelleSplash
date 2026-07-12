@@ -649,6 +649,20 @@
                 width: 100% !important;
                 box-sizing: border-box;
             }
+
+            /* ── Riga squadre card admin: colonna verticale su mobile ── */
+            .amc-teams-row {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            .amc-teams-row select {
+                width: 100% !important;
+                max-width: 100% !important;
+            }
+            .amc-vs-label {
+                text-align: center;
+                padding: 2px 0;
+            }
         }
 
 
@@ -3083,6 +3097,29 @@
             border: 1.5px solid transparent;
             margin-bottom: 6px;
             overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* Riga squadre nella card admin */
+        .amc-teams-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .amc-teams-row select {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .amc-vs-label {
+            flex-shrink: 0;
+            font-weight: 900;
+            color: rgba(255,255,255,0.4);
+            font-size: .82rem;
+            white-space: nowrap;
         }
         .amc-time {
             padding: 5px 10px 4px;
@@ -5811,12 +5848,12 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             </div>
 
             <!-- ── Sezione SQUADRE ── -->
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:4px;">
-              <select id="mt1-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;flex:1;">
+            <div class="amc-teams-row">
+              <select id="mt1-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;">
                 ${teamOpts1}
               </select>
-              <div style="font-weight:900; color:rgba(255,255,255,0.4); white-space:nowrap;">VS</div>
-              <select id="mt2-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;flex:1;">
+              <div class="amc-vs-label">VS</div>
+              <select id="mt2-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;">
                 ${teamOpts2}
               </select>
             </div>
