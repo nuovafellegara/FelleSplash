@@ -5797,8 +5797,10 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                     const refOpts = '<option value="">Nessun arbitro (Opzionale)...</option>' + allTeams.map(t => `<option value="${esc(t.name)}" ${t.name === m.arbitro ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
                     return `
           <div class="admin-match-card" style="padding:12px; display:flex; flex-direction:column; gap:8px;">
+
+            <!-- ── Riga superiore: giorno / orario / elimina ── -->
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <div style="display:flex; gap:6px;">
+              <div style="display:flex; gap:6px; align-items:center;">
                 <select id="mday-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.75rem;padding:2px 4px;outline:none;">
                   <option value="SAB" ${m.giorno === 'SAB' ? 'selected' : ''}>SAB</option>
                   <option value="DOM" ${m.giorno === 'DOM' ? 'selected' : ''}>DOM</option>
@@ -5807,33 +5809,44 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
               </div>
               <button class="btn-del-sm" onclick="delMatch('${mid}')">✕ Elimina</button>
             </div>
-            
-            <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:8px; margin-top:4px;">
-              <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
-                <select id="mt1-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;width:100%;">
-                  ${teamOpts1}
-                </select>
-                <input class="score-inp" id="ms1-${mid}" value="${m.s1 || ''}" placeholder="0" maxlength="2" type="number" min="0" style="width:100%; text-align:center;">
-              </div>
-              
-              <div style="font-weight:900; color:rgba(255,255,255,0.4); padding-bottom:10px;">VS</div>
-              
-              <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
-                <select id="mt2-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;width:100%;">
-                  ${teamOpts2}
-                </select>
-                <input class="score-inp" id="ms2-${mid}" value="${m.s2 || ''}" placeholder="0" maxlength="2" type="number" min="0" style="width:100%; text-align:center;">
-              </div>
+
+            <!-- ── Sezione SQUADRE ── -->
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:4px;">
+              <select id="mt1-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;flex:1;">
+                ${teamOpts1}
+              </select>
+              <div style="font-weight:900; color:rgba(255,255,255,0.4); white-space:nowrap;">VS</div>
+              <select id="mt2-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.8rem;padding:4px;outline:none;flex:1;">
+                ${teamOpts2}
+              </select>
             </div>
-            
-            <div style="display:flex; align-items:center; gap:8px; margin-top:4px;">
+
+            <!-- ── Arbitro ── -->
+            <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:0.75rem; opacity:0.7; white-space:nowrap;">🪈 Arbitro:</span>
               <select id="marbitro-${mid}" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:#fff;font-size:.75rem;padding:4px;outline:none;width:100%;">
                 ${refOpts}
               </select>
             </div>
-            
-            <button class="btn-ok" style="width:100%; padding:6px; font-size:.85rem; margin-top:4px;" onclick="saveMatch('${mid}')">💾 Salva Modifiche</button>
+
+            <!-- ── Pulsante: salva scheduling → aggiorna Calendario ── -->
+            <button class="btn-ok" style="width:100%; padding:6px; font-size:.82rem; background:linear-gradient(135deg,#0077b6,#03045e);" onclick="saveMatchSchedule('${mid}')">
+              📅 Salva Partita (Calendario)
+            </button>
+
+            <!-- ── Separatore risultato ── -->
+            <div style="border-top:1px solid rgba(255,255,255,.12); margin-top:2px; padding-top:8px;">
+              <div style="font-size:.72rem; font-weight:700; opacity:.6; letter-spacing:.8px; margin-bottom:6px;">⚽ RISULTATO</div>
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <input class="score-inp" id="ms1-${mid}" value="${m.s1 || ''}" placeholder="0" maxlength="2" type="number" min="0" style="flex:1; text-align:center;">
+                <div style="font-weight:900; color:rgba(255,255,255,0.5);">:</div>
+                <input class="score-inp" id="ms2-${mid}" value="${m.s2 || ''}" placeholder="0" maxlength="2" type="number" min="0" style="flex:1; text-align:center;">
+              </div>
+              <button class="btn-ok" style="width:100%; padding:6px; font-size:.82rem; margin-top:6px; background:linear-gradient(135deg,#ff6b6b,#ee5a24);" onclick="saveMatchScore('${mid}')">
+                ⚽ Salva Risultato
+              </button>
+            </div>
+
           </div>`;
                 }).join('') || '<div style="opacity:.38;font-size:.78rem;padding:6px 0;">Nessuna partita.</div>';
                 if (elAdm) elAdm.innerHTML = admHtml;
@@ -5967,9 +5980,9 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             let countT1 = 0;
             let countT2 = 0;
 
-            for (const mid in _matches) {
-                if (mid === excludeMid) continue;
-                const m = _matches[mid];
+            for (const loopMid in _matches) {
+                if (loopMid === excludeMid) continue;
+                const m = _matches[loopMid];
                 
                 if (m.t1 === t1 || m.t2 === t1) countT1++;
                 if (m.t1 === t2 || m.t2 === t2) countT2++;
@@ -6005,16 +6018,15 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             return { conflict: false, warnMessage: '' };
         }
 
-        function saveMatch(mid) {
-            const s1 = document.getElementById('ms1-' + mid).value;
-            const s2 = document.getElementById('ms2-' + mid).value;
+        /* ── Salva solo i dati di scheduling (giorno, orario, squadre, arbitro) ── */
+        function saveMatchSchedule(mid) {
             const t1 = document.getElementById('mt1-' + mid).value;
             const t2 = document.getElementById('mt2-' + mid).value;
             const arbitro = document.getElementById('marbitro-' + mid) ? document.getElementById('marbitro-' + mid).value : '';
             const day = document.getElementById('mday-' + mid).value;
             const time = document.getElementById('mtime-' + mid).value;
             const campo = _matches[mid].girone;
-            
+
             const validation = validateMatchData(t1, t2, campo, time, day, mid, arbitro);
             if (validation.conflict) {
                 if (validation.warnMessage.startsWith('⚠️')) {
@@ -6024,25 +6036,42 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 }
                 return;
             }
-            
-            _matches[mid].s1 = s1; 
-            _matches[mid].s2 = s2;
-            _matches[mid].t1 = t1;
-            _matches[mid].t2 = t2;
-            _matches[mid].giorno = day;
-            _matches[mid].orario = time;
+
+            _matches[mid].t1      = t1;
+            _matches[mid].t2      = t2;
+            _matches[mid].giorno  = day;
+            _matches[mid].orario  = time;
             _matches[mid].arbitro = arbitro;
 
             saveMatches();
-            const m = _matches[mid];
-            if (s1 !== '' && s2 !== '') {
-                sendNotif('⚽ Risultato aggiornato', `${m.t1} ${s1}–${s2} ${m.t2}`);
-            }
             renderCampi();
             renderLeaderboard();
             renderTeams();
-            toast('✅ Modifiche salvate!');
+            toast('✅ Partita aggiornata nel calendario!');
         }
+
+        /* ── Salva solo il risultato (s1, s2) ── */
+        function saveMatchScore(mid) {
+            const s1 = document.getElementById('ms1-' + mid).value;
+            const s2 = document.getElementById('ms2-' + mid).value;
+
+            if (s1 === '' || s2 === '') {
+                toast('⚠️ Inserisci entrambi i punteggi!');
+                return;
+            }
+
+            _matches[mid].s1 = s1;
+            _matches[mid].s2 = s2;
+
+            saveMatches();
+            const m = _matches[mid];
+            sendNotif('⚽ Risultato aggiornato', `${m.t1} ${s1}–${s2} ${m.t2}`);
+            renderCampi();
+            renderLeaderboard();
+            renderTeams();
+            toast('✅ Risultato salvato!');
+        }
+
         function delMatch(mid) {
             delete _matches[mid]; saveMatches(); renderCampi(); renderLeaderboard(); renderTeams();
         }
