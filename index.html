@@ -6318,6 +6318,59 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 html += '</div>';
             }
 
+            /* Sezione distribuzione orari */
+            const distRows = [];
+            Object.entries(teamStats).sort(([a],[b]) => a.localeCompare(b)).forEach(([team, s]) => {
+                ['SAB', 'DOM'].forEach(giorno => {
+                    const dayM = s.matches
+                        .filter(m => m.giorno === giorno)
+                        .sort((a, b) => {
+                            const [aH, aM] = a.orario.split(':').map(Number);
+                            const [bH, bM] = b.orario.split(':').map(Number);
+                            return (aH * 60 + aM) - (bH * 60 + bM);
+                        });
+                    if (dayM.length < 2) return; // solo squadre con 2+ partite
+                    // Calcola gap consecutivi e finestra totale
+                    const gaps = [];
+                    for (let i = 0; i < dayM.length - 1; i++) {
+                        const [h1, m1] = dayM[i].orario.split(':').map(Number);
+                        const [h2, m2] = dayM[i+1].orario.split(':').map(Number);
+                        gaps.push((h2 * 60 + m2) - (h1 * 60 + m1));
+                    }
+                    const [fH, fM] = dayM[0].orario.split(':').map(Number);
+                    const [lH, lM] = dayM[dayM.length-1].orario.split(':').map(Number);
+                    const windowMin = (lH * 60 + lM) - (fH * 60 + fM);
+                    const windowStr = windowMin >= 60
+                        ? `${Math.floor(windowMin/60)}h ${windowMin%60 > 0 ? windowMin%60+'min' : ''}`.trim()
+                        : `${windowMin}min`;
+                    // Costruisce la stringa degli orari con gap colorati
+                    let timeline = '';
+                    dayM.forEach((m, i) => {
+                        const gapColor = i < gaps.length
+                            ? (gaps[i] < 60 ? '#ffd166' : gaps[i] < 120 ? 'rgba(255,255,255,.55)' : '#4ade80')
+                            : '';
+                        timeline += `<span style="font-weight:700;">${m.orario}</span><span style="font-size:.68rem;opacity:.7;"> C.${m.campo}</span>`;
+                        if (i < gaps.length) {
+                            timeline += ` <span style="color:${gapColor};font-size:.72rem;font-weight:700;">→ +${gaps[i]}min →</span> `;
+                        }
+                    });
+                    distRows.push(`
+                        <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);">
+                            <div style="font-size:.72rem;font-weight:900;color:var(--foam);margin-bottom:3px;">${esc(team)} <span style="opacity:.55;font-weight:600;">— ${giorno}</span></div>
+                            <div style="font-size:.75rem;line-height:1.6;">${timeline}</div>
+                            <div style="font-size:.68rem;opacity:.5;margin-top:2px;">Finestra: <strong style="opacity:1;">${windowStr}</strong> &nbsp;|&nbsp; ${dayM.length} partite</div>
+                        </div>`);
+                });
+            });
+
+            if (distRows.length > 0) {
+                html += `<div class="conflict-section" style="background:rgba(0,180,216,.04)">`;
+                html += `<div class="conflict-section-title" style="color:#90e0ef;">📅 Distribuzione Orari <span style="font-weight:400;font-size:.65rem;opacity:.6;">(solo squadre con 2+ partite nello stesso giorno)</span></div>`;
+                html += `<div style="font-size:.68rem;opacity:.45;margin-bottom:8px;">Gap: <span style="color:#ffd166;">●</span> 40–59min &nbsp; <span style="color:rgba(255,255,255,.55);">●</span> 60–119min &nbsp; <span style="color:#4ade80;">●</span> ≥120min</div>`;
+                distRows.forEach(r => { html += r; });
+                html += '</div>';
+            }
+
             /* Sezione tabella riepilogativa */
             html += `<div class="conflict-section" style="background:rgba(0,0,0,.15)">`;
             html += `<div class="conflict-section-title" style="color:var(--foam);">📊 Stato Squadre</div>`;
