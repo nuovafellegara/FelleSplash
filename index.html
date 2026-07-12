@@ -6217,6 +6217,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
         function checkAllConflicts() {
             const allMatches = Object.entries(_matches);
             const errors   = [];
+            const warnings = [];  // avvisi non bloccanti
 
             /* ─── Costruisce profilo per ogni squadra ─── */
             const teamStats = {};
@@ -6258,11 +6259,11 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 if (s.total > 6)
                     errors.push(`👥 <strong>${tEsc}</strong>: ${s.total} partite totali (max 6)`);
 
-                /* Regola 3: max 3 per giorno */
+                /* Regola 3: max 3 per giorno → AVVISO (non bloccante) */
                 if (s.bySAB > 3)
-                    errors.push(`📅 <strong>${tEsc}</strong>: ${s.bySAB} partite di SABATO (max 3)`);
+                    warnings.push(`📅 <strong>${tEsc}</strong>: ${s.bySAB} partite di SABATO (consigliato max 3)`);
                 if (s.byDOM > 3)
-                    errors.push(`📅 <strong>${tEsc}</strong>: ${s.byDOM} partite di DOMENICA (max 3)`);
+                    warnings.push(`📅 <strong>${tEsc}</strong>: ${s.byDOM} partite di DOMENICA (consigliato max 3)`);
 
                 /* Regola 4: min 3 su ogni campo (solo se ha già 6 partite) */
                 if (s.total >= 6) {
@@ -6307,6 +6308,16 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             }
             html += '</div>';
 
+            /* Sezione avvisi (giorno) */
+            if (warnings.length > 0) {
+                html += `<div class="conflict-section" style="background:rgba(255,209,102,.05)">`;
+                html += `<div class="conflict-section-title" style="color:#ffd166;">⚠️ Avvisi partite per giorno (${warnings.length})</div>`;
+                warnings.forEach(w => {
+                    html += `<div class="conflict-item" style="background:rgba(255,209,102,.08);border-left:3px solid #ffd166;">${w}</div>`;
+                });
+                html += '</div>';
+            }
+
             /* Sezione tabella riepilogativa */
             html += `<div class="conflict-section" style="background:rgba(0,0,0,.15)">`;
             html += `<div class="conflict-section-title" style="color:var(--foam);">📊 Stato Squadre</div>`;
@@ -6322,8 +6333,8 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
 
             Object.entries(teamStats).sort(([a],[b]) => a.localeCompare(b)).forEach(([team, s]) => {
                 const totCls  = s.total > 6 ? 'cst-err' : s.total === 6 ? 'cst-ok' : 'cst-warn';
-                const sabCls  = s.bySAB > 3 ? 'cst-err' : '';
-                const domCls  = s.byDOM > 3 ? 'cst-err' : '';
+                const sabCls  = s.bySAB > 3 ? 'cst-warn' : '';
+                const domCls  = s.byDOM > 3 ? 'cst-warn' : '';
                 const aCls    = (s.total >= 6 && s.byCampoA < 3) ? 'cst-err' : (s.byCampoA >= 3 ? 'cst-ok' : '');
                 const bCls    = (s.total >= 6 && s.byCampoB < 3) ? 'cst-err' : (s.byCampoB >= 3 ? 'cst-ok' : '');
                 html += `<tr>
