@@ -4535,7 +4535,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
 
     <!-- MODAL: ADMIN PANEL -->
     <div class="overlay" id="ovAdmin" onclick="ocl(event,'ovAdmin')">
-        <div class="modal" id="adminModal" style="max-width:520px;transition:max-width .3s ease;">
+        <div class="modal" id="adminModal" style="max-width:700px;transition:max-width .3s ease;">
             <h2>🔑 Area Admin</h2>
             <!-- login -->
             <div id="adminLogin">
@@ -5136,7 +5136,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             const modal = document.getElementById('adminModal');
             if (panel) panel.style.display = 'block';
             if (modal) {
-                modal.style.maxWidth = '900px';
+                modal.style.maxWidth = '1100px';
                 modal.style.display = 'flex';
                 modal.style.gap = '24px';
                 modal.style.alignItems = 'flex-start';
@@ -5151,7 +5151,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             const modal = document.getElementById('adminModal');
             if (panel) panel.style.display = 'none';
             if (modal) {
-                modal.style.maxWidth = '520px';
+                modal.style.maxWidth = '700px';
                 modal.style.display = '';
                 modal.style.gap = '';
                 modal.style.alignItems = '';
@@ -6265,12 +6265,27 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 if (s.byDOM > 3)
                     warnings.push(`📅 <strong>${tEsc}</strong>: ${s.byDOM} partite di DOMENICA (consigliato max 3)`);
 
-                /* Regola 4: min 3 su ogni campo (solo se ha già 6 partite) */
-                if (s.total >= 6) {
-                    if (s.byCampoA < 3)
-                        errors.push(`🏟️ <strong>${tEsc}</strong>: solo ${s.byCampoA} partite su Campo A (min 3)`);
-                    if (s.byCampoB < 3)
-                        errors.push(`🏟️ <strong>${tEsc}</strong>: solo ${s.byCampoB} partite su Campo B (min 3)`);
+                /* Regola 4: esattamente 3 partite su Campo A e 3 su Campo B */
+                const remaining = 6 - s.total;
+                // Errore immediato: già superato il limite su un campo
+                if (s.byCampoA > 3)
+                    errors.push(`🏟️ <strong>${tEsc}</strong>: ${s.byCampoA} partite su Campo A (max 3, esattamente 3 richieste)`);
+                if (s.byCampoB > 3)
+                    errors.push(`🏟️ <strong>${tEsc}</strong>: ${s.byCampoB} partite su Campo B (max 3, esattamente 3 richieste)`);
+                // Errore a torneo concluso: conteggio non esatto
+                if (s.total === 6) {
+                    if (s.byCampoA !== 3)
+                        errors.push(`🏟️ <strong>${tEsc}</strong>: ${s.byCampoA} partite su Campo A (devono essere esattamente 3)`);
+                    if (s.byCampoB !== 3)
+                        errors.push(`🏟️ <strong>${tEsc}</strong>: ${s.byCampoB} partite su Campo B (devono essere esattamente 3)`);
+                }
+                // Avviso preventivo: già impossibile raggiungere 3+3 con le partite restanti
+                if (s.total < 6 && s.byCampoA <= 3 && s.byCampoB <= 3) {
+                    const neededA = Math.max(0, 3 - s.byCampoA);
+                    const neededB = Math.max(0, 3 - s.byCampoB);
+                    if (neededA + neededB > remaining) {
+                        warnings.push(`🏟️ <strong>${tEsc}</strong>: impossibile raggiungere 3+3 partite per campo — mancano ${remaining} partite ma ne servono ${neededA} su A e ${neededB} su B`);
+                    }
                 }
 
                 /* Regola 1: 40 min recupero (stesso giorno, qualsiasi campo) */
@@ -6388,8 +6403,8 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 const totCls  = s.total > 6 ? 'cst-err' : s.total === 6 ? 'cst-ok' : 'cst-warn';
                 const sabCls  = s.bySAB > 3 ? 'cst-warn' : '';
                 const domCls  = s.byDOM > 3 ? 'cst-warn' : '';
-                const aCls    = (s.total >= 6 && s.byCampoA < 3) ? 'cst-err' : (s.byCampoA >= 3 ? 'cst-ok' : '');
-                const bCls    = (s.total >= 6 && s.byCampoB < 3) ? 'cst-err' : (s.byCampoB >= 3 ? 'cst-ok' : '');
+                const aCls    = s.byCampoA > 3 ? 'cst-err' : s.byCampoA === 3 ? 'cst-ok' : (s.total >= 6 ? 'cst-err' : 'cst-warn');
+                const bCls    = s.byCampoB > 3 ? 'cst-err' : s.byCampoB === 3 ? 'cst-ok' : (s.total >= 6 ? 'cst-err' : 'cst-warn');
                 html += `<tr>
                     <td>${esc(team)}</td>
                     <td class="${totCls}">${s.total}</td>
