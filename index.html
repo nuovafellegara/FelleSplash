@@ -2793,7 +2793,7 @@
             flex-wrap: wrap;
             justify-content: center;
             padding: 4px 12px 10px;
-            margin-bottom: 15px;
+            margin-bottom: 4px;
             position: relative;
             z-index: 2;
         }
@@ -4256,20 +4256,6 @@
 
     </section>
 
-    <!-- WAVE 1 -->
-    <div class="waves">
-        <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
-            <path d="M0,30 C200,60 400,0 600,30 C800,60 1000,0 1200,30 C1300,48 1370,18 1440,30 L1440,60 L0,60 Z"
-                fill="rgba(0,119,182,0.18)" />
-        </svg>
-        <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
-            <path d="M0,38 C180,8 360,55 540,28 C720,8 900,58 1080,30 C1200,12 1330,48 1440,36 L1440,60 L0,60 Z"
-                fill="rgba(0,180,216,0.10)" />
-        </svg>
-    </div>
-
-
-
     <!-- LIVE WALL -->
     <div class="live-wall" id="liveWall">
         <div class="lw-header">
@@ -4447,7 +4433,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
     </script>
 
     <!-- LEADERBOARD (CLASSIFICA LIVE) -->
-    <div class="sec-wrap" id="secClassifica" style="margin-top:24px;margin-bottom:36px;">
+    <div class="sec-wrap" id="secClassifica" style="margin-top:8px;margin-bottom:36px;">
         <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
             <!-- CLASSIFICA LIVE TORNEO -->
             <div class="sec-card" style="flex:1; min-width:280px; max-width:500px; text-align:center;">
@@ -4550,12 +4536,11 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             <div id="adminLogin">
                 <p style="opacity:.68;font-size:.85rem;margin-bottom:14px;">Inserisci la password per accedere al
                     pannello di moderazione.</p>
-                <div class="admin-pw-wrap">
-                    <input type="password" id="adminPwInp" placeholder="Password admin…"
-                        onkeydown="if(event.key==='Enter')checkAdminPw()">
+                <form onsubmit="event.preventDefault(); checkAdminPw();" class="admin-pw-wrap">
+                    <input type="password" id="adminPwInp" autocomplete="current-password" placeholder="Password admin…">
                     <div class="admin-pw-err" id="adminPwErr" style="display:none;">❌ Password errata</div>
-                    <button class="btn-ok" onclick="checkAdminPw()">🔓 Accedi</button>
-                </div>
+                    <button type="submit" class="btn-ok">🔓 Accedi</button>
+                </form>
             </div>
             <!-- panel (shown after login) -->
             <div id="adminPanel" style="display:none;">
@@ -6944,7 +6929,14 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
         ══════════════════════════════════ */
         function openAdmin() {
             document.getElementById('ovAdmin').classList.add('open');
-            if (adminLoggedIn) { renderPending(); renderAdminRanking(); populateAdminTeamSelects(); renderAdminFanta(); renderFantaLeaderboard(); }
+            if (adminLoggedIn) {
+                renderPending(); renderAdminRanking(); populateAdminTeamSelects(); renderAdminFanta(); renderFantaLeaderboard();
+            } else {
+                setTimeout(() => {
+                    const pwInp = document.getElementById('adminPwInp');
+                    if (pwInp) pwInp.focus();
+                }, 100);
+            }
         }
         function populateTimeSelect() {
             const select = document.getElementById('addMatchTime');
