@@ -4225,6 +4225,15 @@
                 <span style="font-size:0.75rem;">FANTASPLASH</span>
             </button>
         </div>
+
+        <!-- Terza riga: Ultime News -->
+        <div style="padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06); width: 100%; background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span style="font-size:1.1rem;">📢</span>
+                <span style="font-weight:700; font-size:0.85rem; letter-spacing:0.05em; color:var(--sand);">ULTIME NEWS</span>
+            </div>
+            <div id="publicNewsDisplay" style="font-size:0.9rem; opacity:0.85; line-height:1.4; white-space:pre-wrap;">Caricamento news...</div>
+        </div>
     </div>
 
     <!-- SYNC DOT -->
@@ -4554,6 +4563,13 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
                         <span style="font-size:.82rem;opacity:.6;">Area di controllo torneo</span>
                         <button class="btn-del-sm" onclick="adminLogout()">🚪 Esci</button>
+                    </div>
+
+                    <!-- ══ GESTIONE NEWS ══ -->
+                    <div style="margin-bottom:14px; background:rgba(255,255,255,0.03); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.08);">
+                        <div style="font-size:0.85rem; opacity:0.8; margin-bottom:8px;">📢 Gestione Ultime News</div>
+                        <textarea id="adminNewsInp" placeholder="Inserisci le news... (lascia vuoto per 'Non ci sono news')" style="width:100%; min-height:80px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#fff; padding:8px; font-family:inherit; resize:vertical; margin-bottom:8px; font-size:0.9rem;"></textarea>
+                        <button class="btn-ok" style="width:100%;" onclick="salvaNews()">💾 Salva News</button>
                     </div>
 
                     <!-- ══ CONTROLLA CONFLITTI ══ -->
@@ -4888,6 +4904,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
         let prevLbF = null, prevLbV = null;
         let lwIdx = 0, lwTimer = null;
         let _nextMatch = {};
+        let _news = "";
         let _favs = [];
         let _fantaData = {};  // { [teamName]: [{perf, count, ropeLen, pts, label}] }
         let _igVideos = {};   // { [teamName]: [{url, likes}] }
@@ -5035,10 +5052,28 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 renderFantaLeaderboard();
                 if (adminLoggedIn) renderAdminIgVideos();
             });
+            ref.child('news').on('value', snap => {
+                const v = snap.val();
+                _news = v !== null ? v : "";
+                const display = document.getElementById('publicNewsDisplay');
+                const adminInp = document.getElementById('adminNewsInp');
+                if (adminInp) adminInp.value = _news;
+                if (display) display.innerText = (_news.trim() !== '') ? _news : "Non ci sono news al momento.";
+            });
         }
 
         function saveTeams() { if (_db) _db.ref('fsv6/teams').set(_teams); localStorage.setItem(K_TEAMS, JSON.stringify(_teams)); }
         function saveMedia() { if (_db) _db.ref('fsv6/media').set(_media); localStorage.setItem(K_MEDIA, JSON.stringify(_media)); }
+        function salvaNews() {
+            const testo = document.getElementById('adminNewsInp').value;
+            if (_db) {
+                _db.ref('fsv6/news').set(testo).then(() => {
+                    alert("News salvate con successo!");
+                }).catch(e => {
+                    alert("Errore salvataggio news.");
+                });
+            }
+        }
         function saveVotes() { localStorage.setItem(K_VOTES, JSON.stringify(_myVotes)); }
         function saveComments() { if (_db) _db.ref('fsv6/comments').set(_comments); localStorage.setItem(K_COMMENTS, JSON.stringify(_comments)); }
         function saveMatches() { if (_db) _db.ref('fsv6/matches').set(_matches); localStorage.setItem(K_MATCHES, JSON.stringify(_matches)); }
@@ -6077,44 +6112,13 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 return { conflict: true, warnMessage: '⚠️ La squadra che arbitra non può essere una delle due squadre che giocano!' };
             }
 
-            const [nH, nM] = orario.split(':').map(Number);
-            const newMin = nH * 60 + nM;
-            let countT1 = 0;
-            let countT2 = 0;
-
             for (const loopMid in _matches) {
                 if (loopMid === excludeMid) continue;
                 const m = _matches[loopMid];
-                
-                if (m.t1 === t1 || m.t2 === t1) countT1++;
-                if (m.t1 === t2 || m.t2 === t2) countT2++;
 
                 if ((m.t1 === t1 && m.t2 === t2) || (m.t1 === t2 && m.t2 === t1)) {
                     return { conflict: true, warnMessage: `Queste due squadre si sono già sfidate in precedenza! Non possono giocare contro due volte.` };
                 }
-
-                if (m.giorno === giorno) {
-                    const [cH, cM] = m.orario.split(':').map(Number);
-                    const cMin = cH * 60 + cM;
-                    const timeDiff = Math.abs(newMin - cMin);
-
-                    if (m.girone === campo && timeDiff < 15) {
-                        return { conflict: true, warnMessage: `Sovrapposizione sul Campo ${campo}. C'è già una partita alle ${m.orario} (devi attendere 15 min).` };
-                    }
-
-                    if (m.t1 === t1 || m.t1 === t2 || m.t2 === t1 || m.t2 === t2) {
-                        if (timeDiff < 40) {
-                            const conflictingTeam = (m.t1 === t1 || m.t2 === t1) ? t1 : t2;
-                            return { conflict: true, warnMessage: `La squadra "${conflictingTeam}" ha già una partita alle ${m.orario}. Servono almeno 40 minuti di recupero tra una partita e l'altra!` };
-                        }
-                    }
-                }
-            }
-
-            if (countT1 >= 6) {
-                return { conflict: true, warnMessage: `La squadra "${t1}" ha già raggiunto il limite massimo di 6 partite nel torneo!` };
-            } else if (countT2 >= 6) {
-                return { conflict: true, warnMessage: `La squadra "${t2}" ha già raggiunto il limite massimo di 6 partite nel torneo!` };
             }
 
             return { conflict: false, warnMessage: '' };
@@ -6251,6 +6255,33 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 seenPairs.add(pair);
             });
 
+            /* ─── Check sovrapposizione campo (stesso campo, stesso giorno, < 15 min) ─── */
+            ['SAB', 'DOM'].forEach(giorno => {
+                ['A', 'B'].forEach(campo => {
+                    const campoMatches = allMatches
+                        .filter(([, m]) => m.giorno === giorno && m.girone === campo)
+                        .map(([mid, m]) => ({ mid, orario: m.orario, t1: m.t1, t2: m.t2 }))
+                        .sort((a, b) => {
+                            const [aH, aM] = a.orario.split(':').map(Number);
+                            const [bH, bM] = b.orario.split(':').map(Number);
+                            return (aH * 60 + aM) - (bH * 60 + bM);
+                        });
+                    for (let i = 0; i < campoMatches.length - 1; i++) {
+                        const [h1, m1] = campoMatches[i].orario.split(':').map(Number);
+                        const [h2, m2] = campoMatches[i+1].orario.split(':').map(Number);
+                        const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+                        if (diff < 15) {
+                            errors.push(
+                                `🏟️ <strong>Campo ${campo}</strong> (${giorno}): partita alle ` +
+                                `<strong>${campoMatches[i].orario}</strong> e alle ` +
+                                `<strong>${campoMatches[i+1].orario}</strong> → solo ` +
+                                `<strong>${diff} min</strong> tra le due partite (min 15)`
+                            );
+                        }
+                    }
+                });
+            });
+
             /* ─── Check per squadra ─── */
             Object.entries(teamStats).sort(([a],[b]) => a.localeCompare(b)).forEach(([team, s]) => {
                 const tEsc = esc(team);
@@ -6288,7 +6319,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                     }
                 }
 
-                /* Regola 1: 40 min recupero (stesso giorno, qualsiasi campo) */
+                /* Regola 1: 30 min recupero (stesso giorno, qualsiasi campo) */
                 ['SAB', 'DOM'].forEach(giorno => {
                     const dayM = s.matches
                         .filter(m => m.giorno === giorno)
@@ -6301,12 +6332,57 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                         const [h1, m1] = dayM[i].orario.split(':').map(Number);
                         const [h2, m2] = dayM[i+1].orario.split(':').map(Number);
                         const diff = (h2 * 60 + m2) - (h1 * 60 + m1);
-                        if (diff < 40) {
-                            errors.push(`⏱️ <strong>${tEsc}</strong> (${giorno}): partita alle <strong>${dayM[i].orario}</strong> e alle <strong>${dayM[i+1].orario}</strong> → solo <strong>${diff} min</strong> di recupero (min 40)`);
+                        if (diff < 30) {
+                            errors.push(`⏱️ <strong>${tEsc}</strong> (${giorno}): partita alle <strong>${dayM[i].orario}</strong> e alle <strong>${dayM[i+1].orario}</strong> → solo <strong>${diff} min</strong> di recupero (min 30)`);
                         }
                     }
                 });
+
+                /* ─── Vincoli Specifici Squadre ─── */
+                const getEnd = (orario) => { const [h, m] = orario.split(':').map(Number); return h * 60 + m + 15; };
+                
+                if (team === 'POKEFLIP') {
+                    s.matches.filter(m => m.giorno === 'SAB').forEach(m => {
+                        if (getEnd(m.orario) > 17 * 60) errors.push(`⚠️ <strong>POKEFLIP</strong>: SAB partita alle ${m.orario} termina dopo le 17:00!`);
+                    });
+                }
+                if (team === 'LE BIMBE DI JERRY') {
+                    s.matches.filter(m => m.giorno === 'SAB').forEach(m => {
+                        if (getEnd(m.orario) > 18 * 60 + 15) errors.push(`⚠️ <strong>LE BIMBE DI JERRY</strong>: SAB partita alle ${m.orario} termina dopo le 18:15!`);
+                    });
+                }
+                if (team === 'GLI AMICI DEL LUPPOLO') {
+                    if (s.total === 6 && (s.bySAB < 2 || s.bySAB > 3)) errors.push(`⚠️ <strong>GLI AMICI DEL LUPPOLO</strong>: SAB deve giocare min 2, max 3 partite (ne gioca ${s.bySAB})`);
+                    s.matches.filter(m => m.giorno === 'SAB').forEach(m => {
+                        if (getEnd(m.orario) > 17 * 60) errors.push(`⚠️ <strong>GLI AMICI DEL LUPPOLO</strong>: SAB partita alle ${m.orario} termina dopo le 17:00!`);
+                    });
+                }
+                if (team === 'LE BADDIES') {
+                    s.matches.filter(m => m.giorno === 'SAB').forEach(m => {
+                        if (getEnd(m.orario) > 18 * 60 + 30) errors.push(`⚠️ <strong>LE BADDIES</strong>: SAB partita alle ${m.orario} termina dopo le 18:30!`);
+                    });
+                }
+                s.matches.filter(m => m.giorno === 'DOM').forEach(m => {
+                    if (getEnd(m.orario) > 19 * 60 + 30) errors.push(`⚠️ <strong>${tEsc}</strong>: DOM partita alle ${m.orario} termina dopo le 19:30!`);
+                });
             });
+
+            /* ─── Vincolo Globale: BARRIO 1 vs BARRIO 2 ─── */
+            const b1 = teamStats['BARRIO 1'];
+            const b2 = teamStats['BARRIO 2'];
+            if (b1 && b2 && b1.total === 6 && b2.total === 6) {
+                const derby = b1.matches.find(m => m.giorno === 'SAB' && m.opponent === 'BARRIO 2');
+                if (!derby) {
+                    errors.push(`⚠️ <strong>BARRIO 1 / BARRIO 2</strong>: manca la sfida diretta di SABATO!`);
+                } else {
+                    const [h, m] = derby.orario.split(':').map(Number);
+                    const start = h * 60 + m;
+                    const end = start + 15;
+                    if (start < 17 * 60 || end > 20 * 60 + 30) {
+                        errors.push(`⚠️ <strong>BARRIO 1 / BARRIO 2</strong>: la sfida (${derby.orario}) non è compresa tra le 17:00 e le 20:30!`);
+                    }
+                }
+            }
 
             /* ─── Costruisce HTML del report ─── */
             let html = '';
