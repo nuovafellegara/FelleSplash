@@ -4234,6 +4234,13 @@
             </div>
             <div id="publicNewsDisplay" style="font-size:0.85rem; opacity:0.95; line-height:1.3; white-space:pre-wrap; color:var(--white);">Caricamento news...</div>
         </div>
+
+        <!-- Quarta riga: Prossime Partite -->
+        <div style="padding: 6px 10px; margin: 6px 8px 4px 8px; border-radius: 8px; border: 1px solid rgba(0, 180, 216, 0.4); background: linear-gradient(135deg, rgba(0, 180, 216, 0.1), rgba(0, 119, 182, 0.2)); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--white);">
+            <div style="font-weight:800; font-size:0.75rem; letter-spacing:0.05em; color:var(--sand); text-transform:uppercase; margin-bottom: 4px;">⏳ Prossime Partite</div>
+            <div id="nextMatchA" style="margin-bottom: 2px;"><b>CAMPO A:</b> -</div>
+            <div id="nextMatchB"><b>CAMPO B:</b> -</div>
+        </div>
     </div>
 
     <!-- SYNC DOT -->
@@ -5880,6 +5887,36 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
         // Aggiorna highlight ogni 30 secondi
         setInterval(highlightNextMatch, 30000);
 
+        function updateNextMatchesBanner() {
+            const sortedMatches = Object.entries(_matches).map(x => x[1]).sort((a, b) => {
+                const valA = getMatchSortValue(a);
+                const valB = getMatchSortValue(b);
+                if (valA < valB) return -1;
+                if (valA > valB) return 1;
+                return (a.ts || 0) - (b.ts || 0);
+            });
+
+            const nextA = sortedMatches.find(m => m.girone === 'A' && m.s1 === '' && m.s2 === '');
+            const nextB = sortedMatches.find(m => m.girone === 'B' && m.s1 === '' && m.s2 === '');
+
+            const elA = document.getElementById('nextMatchA');
+            if (elA) {
+                if (nextA) {
+                    elA.innerHTML = `<b>CAMPO A</b> (${nextA.giorno} ${nextA.orario}): ${esc(nextA.t1)} vs ${esc(nextA.t2)}`;
+                } else {
+                    elA.innerHTML = `<b>CAMPO A</b>: Tutte le partite concluse! 🎉`;
+                }
+            }
+
+            const elB = document.getElementById('nextMatchB');
+            if (elB) {
+                if (nextB) {
+                    elB.innerHTML = `<b>CAMPO B</b> (${nextB.giorno} ${nextB.orario}): ${esc(nextB.t1)} vs ${esc(nextB.t2)}`;
+                } else {
+                    elB.innerHTML = `<b>CAMPO B</b>: Tutte le partite concluse! 🎉`;
+                }
+            }
+        }
 
         function renderCampi() {
             ['A', 'B'].forEach(campo => {
@@ -5912,7 +5949,21 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 if (elPub) elPub.innerHTML = pubHtml;
                 // Ricalcola highlight dopo il render
                 setTimeout(highlightNextMatch, 0);
-                const admHtml = matchArr.map(([mid, m]) => {
+                setTimeout(updateNextMatchesBanner, 0);
+                
+                const adminMatchArr = [...matchArr].sort((a, b) => {
+                    const aPlayed = (a[1].s1 !== '' && a[1].s2 !== '') ? 1 : 0;
+                    const bPlayed = (b[1].s1 !== '' && b[1].s2 !== '') ? 1 : 0;
+                    if (aPlayed !== bPlayed) return aPlayed - bPlayed;
+                    
+                    const valA = getMatchSortValue(a[1]);
+                    const valB = getMatchSortValue(b[1]);
+                    if (valA < valB) return -1;
+                    if (valA > valB) return 1;
+                    return (a[1].ts || 0) - (b[1].ts || 0);
+                });
+
+                const admHtml = adminMatchArr.map(([mid, m]) => {
                     const allTeams = Object.values(_teams).sort((a, b) => a.name.localeCompare(b.name));
                     const teamOpts1 = allTeams.map(t => `<option value="${esc(t.name)}" ${t.name === m.t1 ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
                     const teamOpts2 = allTeams.map(t => `<option value="${esc(t.name)}" ${t.name === m.t2 ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
