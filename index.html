@@ -4238,8 +4238,12 @@
         <!-- Quarta riga: Prossime Partite -->
         <div style="padding: 6px 10px; margin: 6px 8px 4px 8px; border-radius: 8px; border: 1px solid rgba(0, 180, 216, 0.4); background: linear-gradient(135deg, rgba(0, 180, 216, 0.1), rgba(0, 119, 182, 0.2)); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--white);">
             <div style="font-weight:800; font-size:0.75rem; letter-spacing:0.05em; color:var(--sand); text-transform:uppercase; margin-bottom: 4px;">⏳ Prossime Partite</div>
-            <div id="nextMatchA" style="margin-bottom: 2px;"><b>CAMPO A:</b> -</div>
-            <div id="nextMatchB"><b>CAMPO B:</b> -</div>
+            <div style="display: flex; flex-direction: row; width: 100%; gap: 10px; margin-top: 4px;">
+                <!-- Colonna Campo A -->
+                <div id="nextMatchesA" style="flex: 1; display: flex; flex-direction: column; gap: 6px;"></div>
+                <!-- Colonna Campo B -->
+                <div id="nextMatchesB" style="flex: 1; display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
         </div>
     </div>
 
@@ -5896,26 +5900,26 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 return (a.ts || 0) - (b.ts || 0);
             });
 
-            const nextA = sortedMatches.find(m => m.girone === 'A' && m.s1 === '' && m.s2 === '');
-            const nextB = sortedMatches.find(m => m.girone === 'B' && m.s1 === '' && m.s2 === '');
+            const nextMatchesA = sortedMatches.filter(m => m.girone === 'A' && m.s1 === '' && m.s2 === '').slice(0, 2);
+            const nextMatchesB = sortedMatches.filter(m => m.girone === 'B' && m.s1 === '' && m.s2 === '').slice(0, 2);
 
-            const elA = document.getElementById('nextMatchA');
-            if (elA) {
-                if (nextA) {
-                    elA.innerHTML = `<b>CAMPO A</b> (${nextA.giorno} ${nextA.orario}): ${esc(nextA.t1)} vs ${esc(nextA.t2)}`;
-                } else {
-                    elA.innerHTML = `<b>CAMPO A</b>: Tutte le partite concluse! 🎉`;
+            function buildMatchHtml(matches, campo) {
+                if (matches.length === 0) {
+                    return `<div style="font-size: 0.75rem; opacity: 0.7; padding-top: 10px;">Tutte le partite concluse! 🎉</div>`;
                 }
+                return matches.map(m => `
+                    <div style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; padding: 4px 2px; text-align: center;">
+                        <div style="font-size: 0.7rem; color: var(--sand); font-weight: bold; margin-bottom: 2px;">CAMPO ${campo} - ${m.giorno} ${m.orario}</div>
+                        <div style="font-size: 0.8rem; font-weight: 600; line-height: 1.2;">${esc(m.t1)} <br><span style="opacity:0.5; font-size:0.65rem; margin:0 2px;">vs</span><br> ${esc(m.t2)}</div>
+                    </div>
+                `).join('');
             }
 
-            const elB = document.getElementById('nextMatchB');
-            if (elB) {
-                if (nextB) {
-                    elB.innerHTML = `<b>CAMPO B</b> (${nextB.giorno} ${nextB.orario}): ${esc(nextB.t1)} vs ${esc(nextB.t2)}`;
-                } else {
-                    elB.innerHTML = `<b>CAMPO B</b>: Tutte le partite concluse! 🎉`;
-                }
-            }
+            const elA = document.getElementById('nextMatchesA');
+            if (elA) elA.innerHTML = buildMatchHtml(nextMatchesA, 'A');
+
+            const elB = document.getElementById('nextMatchesB');
+            if (elB) elB.innerHTML = buildMatchHtml(nextMatchesB, 'B');
         }
 
         function renderCampi() {
