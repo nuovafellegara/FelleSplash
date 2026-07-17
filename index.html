@@ -194,6 +194,11 @@
             .tb-addr-sm {
                 display: none;
             }
+
+            /* Nascondi la barra di navigazione fissa su desktop */
+            .sec-nav {
+                display: none !important;
+            }
         }
 
         @media (max-width:400px) {
@@ -2793,16 +2798,7 @@
         /* ═══════════════════════════════════════
    NAV PILLS (section jump)
 ═══════════════════════════════════════ */
-        .sec-nav {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 4px 12px 10px;
-            margin-bottom: 4px;
-            position: relative;
-            z-index: 2;
-        }
+
 
         .sec-pill {
             background: rgba(255, 255, 255, .08);
