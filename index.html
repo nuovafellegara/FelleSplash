@@ -39,6 +39,9 @@
         html {
             scroll-behavior: smooth;
             -webkit-text-size-adjust: 100%;
+            overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
         }
 
         body {
@@ -47,6 +50,9 @@
             min-height: 100vh;
             color: var(--white);
             overflow-x: hidden;
+            width: 100%;
+            max-width: 100vw;
+            position: relative;
             text-transform: uppercase;
         }
 
@@ -4235,16 +4241,7 @@
             <div id="publicNewsDisplay" style="font-size:0.85rem; opacity:0.95; line-height:1.3; white-space:pre-wrap; color:var(--white);">Caricamento news...</div>
         </div>
 
-        <!-- Quarta riga: Prossime Partite -->
-        <div style="padding: 6px 10px; margin: 6px 8px 4px 8px; border-radius: 8px; border: 1px solid rgba(0, 180, 216, 0.4); background: linear-gradient(135deg, rgba(0, 180, 216, 0.1), rgba(0, 119, 182, 0.2)); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--white);">
-            <div style="font-weight:800; font-size:0.75rem; letter-spacing:0.05em; color:var(--sand); text-transform:uppercase; margin-bottom: 4px;">⏳ Prossime Partite</div>
-            <div style="display: flex; flex-direction: row; width: 100%; gap: 10px; margin-top: 4px;">
-                <!-- Colonna Campo A -->
-                <div id="nextMatchesA" style="flex: 1; display: flex; flex-direction: column; gap: 6px;"></div>
-                <!-- Colonna Campo B -->
-                <div id="nextMatchesB" style="flex: 1; display: flex; flex-direction: column; gap: 6px;"></div>
-            </div>
-        </div>
+
     </div>
 
     <!-- SYNC DOT -->
@@ -4262,6 +4259,17 @@
         </div>
         <div id="auto-refresh-text" style="font-size: 0.78rem; opacity: 0.55; margin-top: 8px; text-align: center; color: var(--foam); letter-spacing: 0.03em;">
             prossimo aggiornamento tra <span id="auto-refresh-countdown" style="font-weight: 700; color: var(--sand);">15:00</span>
+        </div>
+
+        <!-- Prossime Partite (spostato dalla topbar) -->
+        <div style="padding: 6px 10px; margin: 20px 8px 4px 8px; border-radius: 8px; border: 1px solid rgba(0, 180, 216, 0.4); background: linear-gradient(135deg, rgba(0, 180, 216, 0.1), rgba(0, 119, 182, 0.2)); text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.8rem; color: var(--white); z-index: 10; position: relative;">
+            <div style="font-weight:800; font-size:0.75rem; letter-spacing:0.05em; color:var(--sand); text-transform:uppercase; margin-bottom: 4px;">⏳ Prossime Partite</div>
+            <div style="display: flex; flex-direction: row; width: 100%; gap: 10px; margin-top: 4px;">
+                <!-- Colonna Campo A -->
+                <div id="nextMatchesA" style="flex: 1; display: flex; flex-direction: column; gap: 6px;"></div>
+                <!-- Colonna Campo B -->
+                <div id="nextMatchesB" style="flex: 1; display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
         </div>
 
 
@@ -4287,11 +4295,7 @@
         <a href="#secSquadre" class="sec-pill">🏐 Elenco Squadre</a>
     </nav>
 
-    <!-- FOOTER -->
-    <footer style="text-align: center; padding: 40px 20px 60px 20px; font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); margin-top: 40px; border-top: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.2);">
-        <div>Pagina web realizzata da Mirco Cavecchi e Andrea Gilioli</div>
-        <div style="margin-top: 5px; font-size: 0.75rem;">Per la realizzazione sono stati utilizzati strumenti di Intelligenza Artificiale</div>
-    </footer>
+
 
     <!-- MODAL REGOLAMENTO -->
     <div id="modalRegolamento" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:9999; overflow-y:auto; backdrop-filter:blur(6px);">
@@ -7207,6 +7211,10 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             }
         })();
     </script>
+    <!-- FOOTER -->
+    <footer style="text-align: center; padding: 40px 20px 60px 20px; font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: rgba(255, 255, 255, 0.6); margin-top: 40px; border-top: 1px solid rgba(255, 255, 255, 0.1); background: rgba(0, 0, 0, 0.2);">
+        <div>Pagina web realizzata da Mirco Cavecchi e Andrea Gilioli</div>
+        <div style="margin-top: 5px; font-size: 0.75rem;">Per la realizzazione sono stati utilizzati strumenti di Intelligenza Artificiale</div>
+    </footer>
 </body>
-
 </html>
