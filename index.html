@@ -6760,7 +6760,11 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 pts = calcFantaPts(perf, count, null);
                 label = `${FANTA_PERF_NAMES[perf]} — ${count} giocatore/i = ${pts} pt`;
             }
-            if (!_fantaData[team]) _fantaData[team] = [];
+            if (!_fantaData[team]) {
+                _fantaData[team] = [];
+            } else if (!Array.isArray(_fantaData[team])) {
+                _fantaData[team] = Object.values(_fantaData[team]);
+            }
             _fantaData[team].push({ perf: parseInt(perf), count, ropeLen: ropeLen || null, pts, label });
             saveFanta();
             renderAdminFanta();
@@ -6776,6 +6780,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
 
         function adminRemoveFanta(teamName, idx) {
             if (!_fantaData[teamName]) return;
+            if (!Array.isArray(_fantaData[teamName])) _fantaData[teamName] = Object.values(_fantaData[teamName]);
             _fantaData[teamName].splice(idx, 1);
             if (_fantaData[teamName].length === 0) delete _fantaData[teamName];
             saveFanta();
@@ -6791,7 +6796,11 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             const likes = parseInt(document.getElementById('igLikes').value) || 0;
             if (!team) { toast('⚠️ Seleziona una squadra'); return; }
             if (!url)  { toast('⚠️ Incolla il link Instagram'); return; }
-            if (!_igVideos[team]) _igVideos[team] = [];
+            if (!_igVideos[team]) {
+                _igVideos[team] = [];
+            } else if (!Array.isArray(_igVideos[team])) {
+                _igVideos[team] = Object.values(_igVideos[team]);
+            }
             if (_igVideos[team].length >= 6) { toast('⚠️ Massimo 6 video per squadra'); return; }
             _igVideos[team].push({ url, likes });
             saveIgVideos();
@@ -6813,6 +6822,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
 
         function adminRemoveIgVideo(teamName, idx) {
             if (!_igVideos[teamName]) return;
+            if (!Array.isArray(_igVideos[teamName])) _igVideos[teamName] = Object.values(_igVideos[teamName]);
             _igVideos[teamName].splice(idx, 1);
             if (_igVideos[teamName].length === 0) delete _igVideos[teamName];
             saveIgVideos();
@@ -6830,7 +6840,8 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 return;
             }
             el.innerHTML = teams.sort().map(tName => {
-                const vids = _igVideos[tName];
+                let vids = _igVideos[tName];
+                if (!Array.isArray(vids)) vids = Object.values(vids);
                 const rows = vids.map((v, i) => `
                     <div style="display:flex;align-items:center;gap:6px;padding:5px 0;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,.05);">
                         <span style="font-size:1rem;">🔗</span>
@@ -6858,7 +6869,8 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
                 return;
             }
             el.innerHTML = teams.sort().map(tName => {
-                const entries = _fantaData[tName];
+                let entries = _fantaData[tName];
+                if (!Array.isArray(entries)) entries = Object.values(entries);
                 const total = entries.reduce((s, e) => s + e.pts, 0);
                 const rows = entries.map((e, i) => `
                     <div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:.8rem;border-bottom:1px solid rgba(255,255,255,.05);">
@@ -6884,7 +6896,8 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             Object.values(_teams).forEach(t => { pts[t.name] = 0; });
             Object.entries(_fantaData).forEach(([tName, entries]) => {
                 if (!pts[tName]) pts[tName] = 0;
-                entries.forEach(e => { pts[tName] += e.pts; });
+                let arr = Array.isArray(entries) ? entries : Object.values(entries);
+                arr.forEach(e => { pts[tName] += e.pts; });
             });
             // Rimuovi squadre con 0 pt se nessuno ha ancora punti
             const allZero = Object.values(pts).every(v => v === 0);
