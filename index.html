@@ -2986,34 +2986,6 @@
             position: relative;
         }
 
-        /* ── PROSSIMA PARTITA: evidenziazione 5 min prima ── */
-        .match-row.match-next {
-            background: linear-gradient(135deg, rgba(255, 183, 3, 0.14), rgba(255, 107, 107, 0.10));
-            border-color: rgba(255, 183, 3, 0.65);
-            animation: matchGlow 1.8s ease-in-out infinite;
-        }
-
-        @keyframes matchGlow {
-            0%, 100% { box-shadow: 0 0 10px rgba(255, 183, 3, 0.30), 0 0 28px rgba(255, 183, 3, 0.10); }
-            50%       { box-shadow: 0 0 22px rgba(255, 183, 3, 0.70), 0 0 55px rgba(255, 183, 3, 0.28); }
-        }
-
-        .match-row.match-next::before {
-            content: '🔔 PROSSIMA';
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(90deg, #ffb703, #ff6b6b);
-            color: #010e2e;
-            font-size: 0.6rem;
-            font-weight: 900;
-            letter-spacing: 1.5px;
-            padding: 2px 10px;
-            border-radius: 20px;
-            white-space: nowrap;
-            box-shadow: 0 2px 10px rgba(255, 183, 3, 0.5);
-        }
 
         /* Riga 1: badge data + ora centrato */
         .match-time-label {
@@ -5856,40 +5828,6 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             return `${dayVal}_${timeVal}`;
         }
 
-        /* ══════════════════════════════════
-           PROSSIMA PARTITA – evidenziazione
-           SAB = 18 lug 2026 / DOM = 19 lug 2026
-        ══════════════════════════════════ */
-        function highlightNextMatch() {
-            const now = new Date();
-            const baseSAB = new Date('2026-07-18T00:00:00');
-            const baseDOM = new Date('2026-07-19T00:00:00');
-
-            // Rimuovi tutti gli highlight esistenti
-            document.querySelectorAll('.match-row.match-next')
-                    .forEach(el => el.classList.remove('match-next'));
-
-            Object.entries(_matches).forEach(([mid, m]) => {
-                // Salta partite già giocate (con punteggio)
-                if (m.s1 !== '' && m.s2 !== '') return;
-
-                const base = m.giorno === 'DOM' ? baseDOM : baseSAB;
-                const [h, min] = (m.orario || '00:00').split(':').map(Number);
-                const matchTime = new Date(base);
-                matchTime.setHours(h, min, 0, 0);
-
-                const diffMin = (matchTime - now) / 60000;
-
-                // Finestra: da 0 a 5 minuti prima dell'inizio
-                if (diffMin >= 0 && diffMin <= 5) {
-                    const el = document.querySelector(`.match-row[data-mid="${mid}"]`);
-                    if (el) el.classList.add('match-next');
-                }
-            });
-        }
-
-        // Aggiorna highlight ogni 30 secondi
-        setInterval(highlightNextMatch, 30000);
 
         function updateNextMatchesBanner() {
             const sortedMatches = Object.entries(_matches).map(x => x[1]).sort((a, b) => {
@@ -5951,8 +5889,7 @@ I punti aggiuntivi si sommano alla classifica punti del torneo.</div>
             </div>
           </div>`).join('') || '<div style="opacity:.38;font-size:.82rem;padding:8px 0;">Nessuna partita.</div>';
                 if (elPub) elPub.innerHTML = pubHtml;
-                // Ricalcola highlight dopo il render
-                setTimeout(highlightNextMatch, 0);
+                // Ricalcola banner dopo il render
                 setTimeout(updateNextMatchesBanner, 0);
                 
                 const adminMatchArr = [...matchArr].sort((a, b) => {
